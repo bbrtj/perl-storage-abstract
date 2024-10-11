@@ -15,7 +15,6 @@ jobs:
         exclude:
           - runner: windows-latest
             perl: '5.14'
-        exclude:
           - runner: windows-latest
             perl: '5.40'
 
@@ -64,5 +63,4 @@ jobs:
         RELEASE_TESTING: 1
       run: |
         prove -l -r t/
-
 
