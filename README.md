@@ -1,5 +1,5 @@
 # Storage::Abstract
-A Perl module for blah blah blah
+A Perl module for storing files in different locations.
 
 ## Code and documentation
 [Storage::Abstract on CPAN](https://metacpan.org/release/Storage-Abstract)
@@ -15,5 +15,4 @@ bigger so we can talk it through.
 
 ### Author
 Bartosz Jarzyna <bbrtj.pro@gmail.com>
-
 
