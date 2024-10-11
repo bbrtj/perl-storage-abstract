@@ -14,23 +14,26 @@ has field 'files' => (
 	default => sub { {} },
 );
 
-sub store
+sub store_impl
 {
 	my ($self, $name, $handle) = @_;
 	my $files = $self->files;
 
 	$files->{$name}{content} = $self->slurp_handle($handle);
 	$files->{$name}{properties} = $self->common_properties;
-	return;
 }
 
-sub retrieve
+sub is_stored_impl
+{
+	my ($self, $name) = @_;
+
+	return exists $self->files->{$name};
+}
+
+sub retrieve_impl
 {
 	my ($self, $name, $properties) = @_;
 	my $files = $self->files;
-
-	Storage::Abstract::X::NotFound->raise("file $name was not found")
-		unless exists $files->{$name};
 
 	if ($properties) {
 		%{$properties} = %{$files->{$name}{properties}};

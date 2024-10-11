@@ -16,6 +16,7 @@ open my $fh, '<', \$content
 
 # store + retrieve
 $storage->store('some/file', $fh);
+is $storage->is_stored('some/file'), T(), 'is_stored ok';
 my $fh2 = $storage->retrieve('some/file', \my %info);
 
 # slurp the result

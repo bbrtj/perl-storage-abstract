@@ -13,6 +13,7 @@ has param 'driver' => (
 	handles => [
 		qw(
 			store
+			is_stored
 			retrieve
 		)
 	],
