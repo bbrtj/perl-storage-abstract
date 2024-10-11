@@ -1,0 +1,5 @@
+[PerlTidy]
+select = **/*.{pl,pm,t}
+ignore = Storage-Abstract*/**/*.{pl,pm,t}
+argv = -pro=./.perltidyrc --character-encoding=none
+
