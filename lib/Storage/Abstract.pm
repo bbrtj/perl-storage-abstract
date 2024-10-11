@@ -3,6 +3,43 @@ package Storage::Abstract;
 use v5.14;
 use warnings;
 
+use Moo;
+use Mooish::AttributeBuilder;
+use Types::Common -types;
+
+has param 'driver' => (
+	coerce => (InstanceOf ['Storage::Abstract::Driver'])
+		->plus_coercions(HashRef, q{ Storage::Abstract->load_driver($_) }),
+	handles => [
+		qw(
+			store
+			retrieve
+		)
+	],
+);
+
+around BUILDARGS => sub {
+	my ($orig, $self, @args) = @_;
+
+	return $self->$orig(@args)
+		unless @args % 2 == 0;
+
+	return $self->$orig(
+		driver => {@args},
+	);
+};
+
+sub load_driver
+{
+	my ($class, $args) = @_;
+	my $name = ucfirst(delete $args->{driver} // 'Directory');
+	my $full_namespace = "Storage::Abstract::Driver::$name";
+
+	(my $file_path = $full_namespace) =~ s{::}{/}g;
+	require "$file_path.pm";
+	return $full_namespace->new($args);
+}
+
 1;
 
 __END__
@@ -16,7 +53,7 @@ Storage::Abstract - Abstraction for file storage
 	use Storage::Abstract;
 
 	my $storage = Storage::Abstract->new(
-		driver => 'LocalDirectory',
+		driver => 'Directory',
 		directory => '/my/directory',
 	);
 
