@@ -73,12 +73,14 @@ sub slurp_handle
 {
 	my ($self, $handle) = @_;
 
+	my $pos = tell $handle;
 	my $slurped = do {
 		local $/;
 		readline $handle;
 	};
+	seek $handle, $pos, 0;
 
-	Storage::Abstract::X::HandleError->raise($!)
+	Storage::Abstract::X::HandleError->raise($! || 'no error - handle EOF?')
 		unless defined $slurped;
 
 	return $slurped;
