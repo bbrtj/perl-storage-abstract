@@ -15,6 +15,11 @@ use constant UPDIR_STR => '..';
 use constant CURDIR_STR => '.';
 use constant DIRSEP_STR => '/';
 
+has param 'readonly' => (
+	isa => Bool,
+	default => !!0,
+);
+
 # HELPERS
 
 # this is intentionally not portable - only drivers working on an actual
@@ -93,6 +98,9 @@ sub common_properties
 sub store
 {
 	my ($self, $name, $handle) = @_;
+
+	Storage::Abstract::X::StorageError->raise("storage is readonly")
+		if $self->readonly;
 
 	$self->store_impl($self->resolve_path($name), $handle);
 	return;

@@ -55,6 +55,10 @@ package Storage::Abstract::X::HandleError {
 	use parent -norequire, 'Storage::Abstract::X';
 }
 
+package Storage::Abstract::X::StorageError {
+	use parent -norequire, 'Storage::Abstract::X';
+}
+
 1;
 
 __END__
