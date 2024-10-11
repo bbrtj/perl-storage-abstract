@@ -6,16 +6,8 @@ use Storage::Abstract;
 ################################################################################
 
 my $storage = Storage::Abstract->new(
-	driver => 'Memory',
+	driver => 'Null',
 );
-
-# test "file"
-my $content = "test file\nline2\nline3\n\n";
-open my $fh, '<', \$content
-	or die "could not open file handle from scalar: $!";
-
-# store
-$storage->store('a/b/c/d', $fh);
 
 # test invalid paths
 my $err;
@@ -60,11 +52,11 @@ subtest 'path is trying to leave root' => sub {
 
 # test valid paths
 subtest 'path is valid and stored' => sub {
-	is $storage->is_stored('a/b/c/d'), T(), 'stored ok';
-	is $storage->is_stored('/a/b/c/d'), T(), 'stored ok';
-	is $storage->is_stored('./a/b/c/d'), T(), 'stored ok';
-	is $storage->is_stored('a/b/c/d/../d'), T(), 'stored ok';
-	is $storage->is_stored('./a/../a/b/../b/c/../c/././d'), T(), 'stored ok';
+	is $storage->is_stored('a/b/c/d'), F(), 'stored ok';
+	is $storage->is_stored('/a/b/c/d'), F(), 'stored ok';
+	is $storage->is_stored('./a/b/c/d'), F(), 'stored ok';
+	is $storage->is_stored('a/b/c/d/../d'), F(), 'stored ok';
+	is $storage->is_stored('./a/../a/b/../b/c/../c/././d'), F(), 'stored ok';
 };
 
 done_testing;
