@@ -54,7 +54,13 @@ sub store_impl
 	open my $fh, '>', $name
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
 
-	print {$fh} $self->slurp_handle($handle);
+	$self->copy_handle(
+		$handle,
+		sub {
+			print {$fh} $_[0]
+				or Storage::Abstract::X::StorageError->raise("error during file copying: $!");
+		}
+	);
 
 	close $fh
 		or Storage::Abstract::X::StorageError->raise("$name: $!");

@@ -15,6 +15,9 @@ use constant UPDIR_STR => '..';
 use constant CURDIR_STR => '.';
 use constant DIRSEP_STR => '/';
 
+# Copy 8 kB at once
+use constant COPY_SIZE => 8 * 1024;
+
 has param 'readonly' => (
 	writer => 1,
 	isa => Bool,
@@ -68,6 +71,24 @@ sub handle_from_string_ref
 		or Storage::Abstract::X::HandleError->raise($!);
 
 	return $fh;
+}
+
+sub copy_handle
+{
+	my ($self, $handle, $callback) = @_;
+	my $pos = tell $handle;
+	my $buffer;
+
+	while ('copying') {
+		my $bytes = read $handle, $buffer, COPY_SIZE;
+
+		Storage::Abstract::X::HandleError->raise("error reading from handle: $!")
+			unless defined $bytes;
+		last if $bytes == 0;
+		$callback->($buffer);
+	}
+
+	seek $handle, $pos, 0;
 }
 
 sub slurp_handle
