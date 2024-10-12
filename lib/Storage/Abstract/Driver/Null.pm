@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 
 use Moo;
-use Mooish::AttributeBuilder;
+use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
 
 extends 'Storage::Abstract::Driver';
