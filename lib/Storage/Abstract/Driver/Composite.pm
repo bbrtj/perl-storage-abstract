@@ -1,4 +1,4 @@
-package Storage::Abstract::Driver::Relay;
+package Storage::Abstract::Driver::Composite;
 
 use v5.14;
 use warnings;

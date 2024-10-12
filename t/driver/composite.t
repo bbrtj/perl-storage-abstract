@@ -2,11 +2,11 @@ use Test2::V0;
 use Storage::Abstract;
 
 ################################################################################
-# This tests the relay driver
+# This tests the composite driver
 ################################################################################
 
 my $storage = Storage::Abstract->new(
-	driver => 'relay',
+	driver => 'composite',
 	sources => [
 		{
 			driver => 'Memory',
