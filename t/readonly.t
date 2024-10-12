@@ -12,15 +12,13 @@ my $storage = Storage::Abstract->new(
 	driver => 'Memory',
 );
 
-my $fh = get_testfile_handle;
-
-$storage->store('foo', $fh);
-$storage->store('bar', $fh);
+$storage->store('foo', get_testfile_handle);
+$storage->store('bar', get_testfile_handle);
 $storage->set_readonly(1);
 
 subtest 'should not be able to store' => sub {
 	my $err = dies {
-		$storage->store('some/file', $fh);
+		$storage->store('some/file', get_testfile_handle);
 	};
 
 	isa_ok $err, 'Storage::Abstract::X::StorageError';

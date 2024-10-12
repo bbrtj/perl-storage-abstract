@@ -37,6 +37,7 @@ sub get_testfile_handle
 sub slurp_handle
 {
 	my ($fh) = @_;
+	seek $fh, 0, 0;
 
 	return Storage::Abstract::Driver->slurp_handle($fh);
 }

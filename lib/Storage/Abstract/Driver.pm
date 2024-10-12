@@ -7,6 +7,7 @@ use Moo;
 use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
 
+use Scalar::Util qw(blessed);
 use Storage::Abstract::X;
 
 # Not using File::Spec here, because paths must be unix-like regardless of
@@ -14,9 +15,6 @@ use Storage::Abstract::X;
 use constant UPDIR_STR => '..';
 use constant CURDIR_STR => '.';
 use constant DIRSEP_STR => '/';
-
-# Copy 8 kB at once
-use constant COPY_SIZE => 8 * 1024;
 
 has param 'readonly' => (
 	writer => 1,
@@ -66,6 +64,8 @@ sub resolve_path
 sub open_handle
 {
 	my ($self, $arg) = @_;
+	return $arg
+		if blessed $arg && $arg->isa('IO::Handle');
 
 	open my $fh, '<', $arg
 		or Storage::Abstract::X::HandleError->raise((ref $arg ? '' : "$arg: ") . $!);
@@ -75,32 +75,39 @@ sub open_handle
 
 sub copy_handle
 {
-	my ($self, $handle, $callback) = @_;
-	my $pos = tell $handle;
-	my $buffer;
+	my ($self, $handle_from, $handle_to) = @_;
+	binmode $handle_from;
+	binmode $handle_to;
 
+	my $read = sub { read $_[0], $_[1], 8 * 1024 };
+	my $write = sub { print {$_[0]} $_[1] };
+
+	# can use sysread / syswrite?
+	if (fileno $handle_from != -1 && fileno $handle_to != -1) {
+		$read = sub { sysread $_[0], $_[1], 128 * 1024 };
+		$write = sub { syswrite $_[0], $_[1] };
+	}
+
+	my $buffer;
 	while ('copying') {
-		my $bytes = read $handle, $buffer, COPY_SIZE;
+		my $bytes = $read->($handle_from, $buffer);
 
 		Storage::Abstract::X::HandleError->raise("error reading from handle: $!")
 			unless defined $bytes;
 		last if $bytes == 0;
-		$callback->($buffer);
+		$write->($handle_to, $buffer)
+			or Storage::Abstract::X::StorageError->raise("error during file copying: $!");
 	}
-
-	seek $handle, $pos, 0;
 }
 
 sub slurp_handle
 {
 	my ($self, $handle) = @_;
 
-	my $pos = tell $handle;
 	my $slurped = do {
 		local $/;
 		readline $handle;
 	};
-	seek $handle, $pos, 0;
 
 	Storage::Abstract::X::HandleError->raise($! || 'no error - handle EOF?')
 		unless defined $slurped;
@@ -153,7 +160,7 @@ sub store
 {
 	my ($self, $name, $handle) = @_;
 
-	if (!defined fileno $handle) {
+	if (ref $handle ne 'GLOB') {
 		Storage::Abstract::X::HandleError->raise('handle argument is not defined')
 			unless defined $handle;
 

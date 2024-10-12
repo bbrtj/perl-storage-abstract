@@ -55,13 +55,7 @@ sub store_impl
 	open my $fh, '>', $name
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
 
-	$self->copy_handle(
-		$handle,
-		sub {
-			print {$fh} $_[0]
-				or Storage::Abstract::X::StorageError->raise("error during file copying: $!");
-		}
-	);
+	$self->copy_handle($handle, $fh);
 
 	close $fh
 		or Storage::Abstract::X::StorageError->raise("$name: $!");

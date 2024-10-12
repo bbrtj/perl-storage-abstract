@@ -12,13 +12,11 @@ my $storage = Storage::Abstract->new(
 	driver => 'Memory',
 );
 
-my $fh = get_testfile_handle('utf8.txt');
-
-$storage->store('some/file', $fh);
+$storage->store('some/file', get_testfile_handle('utf8.txt'));
 my $fh2 = $storage->retrieve('some/file');
 
 my $content = slurp_handle($fh2);
-is $content, slurp_handle($fh), 'unicode content ok';
+is $content, slurp_handle(get_testfile_handle('utf8.txt')), 'unicode content ok';
 unlike $content, qr/zażółć/, 'not unicode ok';
 
 # now slurp using proper binmode

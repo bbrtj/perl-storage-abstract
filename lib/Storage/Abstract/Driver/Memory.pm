@@ -19,8 +19,15 @@ sub store_impl
 	my ($self, $name, $handle) = @_;
 	my $files = $self->files;
 
-	$files->{$name}{content} = $self->slurp_handle($handle);
 	$files->{$name}{properties} = $self->common_properties;
+
+	open my $fh, '>', \$files->{$name}{content}
+		or Storage::Abstract::X::StorageError->raise("Could not open storage: $!");
+
+	$self->copy_handle($handle, $fh);
+
+	close $fh
+		or Storage::Abstract::X::StorageError->raise("Could not close handle: $!");
 }
 
 sub is_stored_impl
