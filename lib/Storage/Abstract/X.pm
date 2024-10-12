@@ -16,6 +16,17 @@ has param 'message' => (
 	writer => -hidden,
 );
 
+has field 'caller' => (
+	default => sub {
+		for my $call_level (1 .. 10) {
+			my @data = caller $call_level;
+			return \@data
+				if $data[1] !~ /^\(eval/ && $data[0] !~ /^Storage::Abstract/;
+		}
+		return undef;
+	},
+);
+
 sub raise
 {
 	my ($self, $error) = @_;
@@ -34,11 +45,15 @@ sub as_string
 	my $raised = $self->message;
 	$raised =~ s/\s+\z//;
 
+	if (my $caller = $self->caller) {
+		$raised .= ' (raised at ' . $caller->[1] . ', line ' . $caller->[2] . ')';
+	}
+
 	my $class = ref $self;
 	my $pkg = __PACKAGE__;
 	$class =~ s/${pkg}:://;
 
-	return "Storage error: [$class] $raised";
+	return "Storage::Abstract exception: [$class] $raised";
 }
 
 ## SUBCLASSES
