@@ -17,9 +17,9 @@ my $storage = Storage::Abstract->new(
 			directory => 't/testfiles',
 			readonly => !!1,
 		},
-		{
-			driver => 'Memory',
-		},
+		Storage::Abstract->new(
+			driver => 'memory',
+		),
 	],
 );
 
