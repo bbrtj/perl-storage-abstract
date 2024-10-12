@@ -67,7 +67,7 @@ sub open_handle
 	return $arg
 		if blessed $arg && $arg->isa('IO::Handle');
 
-	open my $fh, '<', $arg
+	open my $fh, '<:raw', $arg
 		or Storage::Abstract::X::HandleError->raise((ref $arg ? '' : "$arg: ") . $!);
 
 	return $fh;
@@ -76,8 +76,9 @@ sub open_handle
 sub copy_handle
 {
 	my ($self, $handle_from, $handle_to) = @_;
-	binmode $handle_from;
-	binmode $handle_to;
+
+	# no extra behavior of print
+	local $\;
 
 	my $read = sub { read $_[0], $_[1], 8 * 1024 };
 	my $write = sub { print {$_[0]} $_[1] };
@@ -85,7 +86,16 @@ sub copy_handle
 	# can use sysread / syswrite?
 	if (fileno $handle_from != -1 && fileno $handle_to != -1) {
 		$read = sub { sysread $_[0], $_[1], 128 * 1024 };
-		$write = sub { syswrite $_[0], $_[1] };
+		$write = sub {
+			my $written = 0;
+			while ($written < $_[2]) {
+				my $res = syswrite $_[0], $_[1], $_[2], $written;
+				return undef unless defined $res;
+				$written += $res;
+			}
+
+			return 1;
+		};
 	}
 
 	my $buffer;
@@ -95,24 +105,9 @@ sub copy_handle
 		Storage::Abstract::X::HandleError->raise("error reading from handle: $!")
 			unless defined $bytes;
 		last if $bytes == 0;
-		$write->($handle_to, $buffer)
+		$write->($handle_to, $buffer, $bytes)
 			or Storage::Abstract::X::StorageError->raise("error during file copying: $!");
 	}
-}
-
-sub slurp_handle
-{
-	my ($self, $handle) = @_;
-
-	my $slurped = do {
-		local $/;
-		readline $handle;
-	};
-
-	Storage::Abstract::X::HandleError->raise($! || 'no error - handle EOF?')
-		unless defined $slurped;
-
-	return $slurped;
 }
 
 sub common_properties

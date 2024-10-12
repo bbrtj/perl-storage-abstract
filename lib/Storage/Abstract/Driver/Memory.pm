@@ -21,7 +21,7 @@ sub store_impl
 
 	$files->{$name}{properties} = $self->common_properties;
 
-	open my $fh, '>', \$files->{$name}{content}
+	open my $fh, '>:raw', \$files->{$name}{content}
 		or Storage::Abstract::X::StorageError->raise("Could not open storage: $!");
 
 	$self->copy_handle($handle, $fh);

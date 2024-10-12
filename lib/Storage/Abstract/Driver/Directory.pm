@@ -52,7 +52,7 @@ sub store_impl
 	my $directory = dirname($name);
 	make_path($directory) unless -e $directory;
 
-	open my $fh, '>', $name
+	open my $fh, '>:raw', $name
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
 
 	$self->copy_handle($handle, $fh);
@@ -79,10 +79,7 @@ sub retrieve_impl
 		);
 	}
 
-	open my $fh, '<', $name
-		or Storage::Abstract::X::StorageError->raise("$name: $!");
-
-	return $fh;
+	return $self->open_handle($name);
 }
 
 sub dispose_impl

@@ -28,7 +28,7 @@ sub get_testfile_handle
 	my ($name) = @_;
 
 	my $file = get_testfile($name);
-	open my $fh, '<', $file
+	open my $fh, '<:raw', $file
 		or die "$file error: $!";
 
 	return $fh;
@@ -39,7 +39,15 @@ sub slurp_handle
 	my ($fh) = @_;
 	seek $fh, 0, 0;
 
-	return Storage::Abstract::Driver->slurp_handle($fh);
+	my $slurped = do {
+		local $/;
+		readline $fh;
+	};
+
+	die $! || 'no error - handle EOF?'
+		unless defined $slurped;
+
+	return $slurped;
 }
 
 1;
