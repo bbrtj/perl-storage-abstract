@@ -11,7 +11,8 @@ use File::Spec;
 use File::Path qw(make_path);
 use File::Basename qw(dirname);
 
-extends 'Storage::Abstract::Driver';
+# need this in BEGIN block because we use constants from this package
+BEGIN { extends 'Storage::Abstract::Driver' }
 
 # This driver deals with OS filesystem directly, so these must be
 # system-specific. Unix paths from Storage::Abstract::Driver must be converted
