@@ -63,12 +63,12 @@ sub resolve_path
 	return join DIRSEP_STR, @path;
 }
 
-sub handle_from_string_ref
+sub open_handle
 {
-	my ($self, $string_ref) = @_;
+	my ($self, $arg) = @_;
 
-	open my $fh, '<', $string_ref
-		or Storage::Abstract::X::HandleError->raise($!);
+	open my $fh, '<', $arg
+		or Storage::Abstract::X::HandleError->raise((ref $arg ? '' : "$arg: ") . $!);
 
 	return $fh;
 }
@@ -153,8 +153,12 @@ sub store
 {
 	my ($self, $name, $handle) = @_;
 
-	Storage::Abstract::X::HandleError->raise('argument is not a handle')
-		unless defined fileno $handle;
+	if (!defined fileno $handle) {
+		Storage::Abstract::X::HandleError->raise('handle argument is not defined')
+			unless defined $handle;
+
+		$handle = $self->open_handle($handle);
+	}
 
 	Storage::Abstract::X::StorageError->raise('storage is readonly')
 		if $self->readonly;

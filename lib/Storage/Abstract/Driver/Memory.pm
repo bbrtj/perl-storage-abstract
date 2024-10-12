@@ -39,7 +39,7 @@ sub retrieve_impl
 		%{$properties} = %{$files->{$name}{properties}};
 	}
 
-	return $self->handle_from_string_ref(\$files->{$name}{content});
+	return $self->open_handle(\$files->{$name}{content});
 }
 
 sub dispose_impl
