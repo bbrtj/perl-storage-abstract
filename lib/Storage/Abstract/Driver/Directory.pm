@@ -13,6 +13,13 @@ use File::Basename qw(dirname);
 
 extends 'Storage::Abstract::Driver';
 
+# This driver deals with OS filesystem directly, so these must be
+# system-specific. Unix paths from Storage::Abstract::Driver must be converted
+# to paths on this OS
+use constant UPDIR_STR => File::Spec->updir;
+use constant CURDIR_STR => File::Spec->curdir;
+use constant DIRSEP_STR => File::Spec->catfile('', '');
+
 has param 'directory' => (
 	isa => SimpleStr->where(q{-d}),
 );
@@ -22,10 +29,17 @@ sub resolve_path
 	my ($self, $name) = @_;
 
 	my $resolved = $self->SUPER::resolve_path($name);
+	if (Storage::Abstract::Driver::DIRSEP_STR ne DIRSEP_STR) {
+		Storage::Abstract::X::PathError->raise("System-specific dirsep in file path $name")
+			if $resolved =~ quotemeta DIRSEP_STR;
+	}
+
 	my @parts = split Storage::Abstract::Driver::DIRSEP_STR, $resolved;
 
-	Storage::Abstract::X::PathError->raise("System-specific updir in file path $name")
-		unless @parts == File::Spec->no_upwards(@parts);
+	if (Storage::Abstract::Driver::UPDIR_STR ne UPDIR_STR || Storage::Abstract::Driver::CURDIR_STR ne CURDIR_STR) {
+		Storage::Abstract::X::PathError->raise("System-specific updir or curdir in file path $name")
+			unless @parts == File::Spec->no_upwards(@parts);
+	}
 
 	return File::Spec->catfile($self->directory, @parts);
 }

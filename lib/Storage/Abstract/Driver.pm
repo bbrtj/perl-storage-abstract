@@ -9,7 +9,7 @@ use Types::Common -types;
 
 use Storage::Abstract::X;
 
-# not using File::Spec here, because paths must be unix-like regardless of
+# Not using File::Spec here, because paths must be unix-like regardless of
 # local OS
 use constant UPDIR_STR => '..';
 use constant CURDIR_STR => '.';
