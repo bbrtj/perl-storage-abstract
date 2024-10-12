@@ -96,6 +96,36 @@ sub common_properties
 	};
 }
 
+# TO BE IMPLEMENTED IN SUBCLASSES
+
+sub store_impl
+{
+	my ($self, $name, $handle) = @_;
+
+	...;
+}
+
+sub is_stored_impl
+{
+	my ($self, $name) = @_;
+
+	...;
+}
+
+sub retrieve_impl
+{
+	my ($self, $name, $properties) = @_;
+
+	...;
+}
+
+sub dispose_impl
+{
+	my ($self, $name, $handle) = @_;
+
+	...;
+}
+
 # PUBLIC INTERFACE
 
 sub store
