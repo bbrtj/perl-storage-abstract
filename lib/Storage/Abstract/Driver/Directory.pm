@@ -70,6 +70,14 @@ sub retrieve_impl
 	return $fh;
 }
 
+sub dispose_impl
+{
+	my ($self, $name) = @_;
+
+	unlink $name
+		or Storage::Abstract::X::StorageError->raise("$name: $!");
+}
+
 1;
 
 __END__

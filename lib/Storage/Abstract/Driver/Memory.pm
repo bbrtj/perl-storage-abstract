@@ -42,6 +42,13 @@ sub retrieve_impl
 	return $self->handle_from_string_ref(\$files->{$name}{content});
 }
 
+sub dispose_impl
+{
+	my ($self, $name) = @_;
+
+	delete $self->files->{$name};
+}
+
 1;
 
 __END__

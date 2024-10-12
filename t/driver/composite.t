@@ -37,5 +37,8 @@ ok $storage->driver->sources->[1]->is_stored('foo'), 'stored in memory driver ok
 
 is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('page.html')), 'new file ok';
 
+$storage->dispose('foo');
+ok !$storage->is_stored('foo'), 'foo disposed ok';
+
 done_testing;
 

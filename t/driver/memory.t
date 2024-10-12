@@ -25,5 +25,8 @@ my $fh2 = $storage->retrieve('some/file', \my %info);
 is slurp_handle($fh2), slurp_handle($fh), 'content ok';
 is $info{mtime}, within(time, 3), 'mtime ok';
 
+$storage->dispose('/some/file');
+ok !$storage->is_stored('/some/file'), 'foo disposed ok';
+
 done_testing;
 

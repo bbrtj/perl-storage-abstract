@@ -25,6 +25,11 @@ sub retrieve_impl
 	# will never be called
 }
 
+sub dispose_impl
+{
+	# will never be called
+}
+
 1;
 
 __END__

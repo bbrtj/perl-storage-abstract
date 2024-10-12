@@ -16,6 +16,7 @@ use constant CURDIR_STR => '.';
 use constant DIRSEP_STR => '/';
 
 has param 'readonly' => (
+	writer => 1,
 	isa => Bool,
 	default => !!0,
 );
@@ -127,6 +128,22 @@ sub retrieve
 		unless $self->is_stored_impl($path);
 
 	return $self->retrieve_impl($path, $properties);
+}
+
+sub dispose
+{
+	my ($self, $name) = @_;
+
+	Storage::Abstract::X::StorageError->raise('storage is readonly')
+		if $self->readonly;
+
+	my $path = $self->resolve_path($name);
+
+	Storage::Abstract::X::NotFound->raise("file $name was not found")
+		unless $self->is_stored_impl($path);
+
+	$self->dispose_impl($path);
+	return;
 }
 
 1;

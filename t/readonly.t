@@ -10,17 +10,31 @@ use Storage::Abstract::Test;
 
 my $storage = Storage::Abstract->new(
 	driver => 'Memory',
-	readonly => 1,
 );
 
 my $fh = get_testfile_handle;
 
-my $err = dies {
-	$storage->store('some/file', $fh);
+$storage->store('foo', $fh);
+$storage->store('bar', $fh);
+$storage->set_readonly(1);
+
+subtest 'should not be able to store' => sub {
+	my $err = dies {
+		$storage->store('some/file', $fh);
+	};
+
+	isa_ok $err, 'Storage::Abstract::X::StorageError';
+	like $err, qr/is readonly/;
 };
 
-isa_ok $err, 'Storage::Abstract::X::StorageError';
-like $err, qr/is readonly/;
+subtest 'should not be able to dispose' => sub {
+	my $err = dies {
+		$storage->dispose('foo');
+	};
+
+	isa_ok $err, 'Storage::Abstract::X::StorageError';
+	like $err, qr/is readonly/;
+};
 
 done_testing;
 
