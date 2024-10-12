@@ -18,7 +18,7 @@ my @testdir = qw(t testfiles);
 sub get_testfile
 {
 	my ($name) = @_;
-	$name //= 'wiki.html';
+	$name //= 'page.html';
 
 	return File::Spec->catdir(@testdir, $name);
 }

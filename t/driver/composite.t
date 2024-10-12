@@ -23,7 +23,7 @@ my $storage = Storage::Abstract->new(
 	],
 );
 
-ok $storage->is_stored('wiki.html'), 'wiki.html stored ok';
+ok $storage->is_stored('page.html'), 'page.html stored ok';
 ok $storage->is_stored('utf8.txt'), 'utf8 stored ok';
 ok !$storage->is_stored('foo'), 'foo not stored ok';
 
@@ -35,7 +35,7 @@ ok lives {
 ok !$storage->driver->sources->[0]->is_stored('foo'), 'not stored in readonly driver ok';
 ok $storage->driver->sources->[1]->is_stored('foo'), 'stored in memory driver ok';
 
-is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('wiki.html')), 'new file ok';
+is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('page.html')), 'new file ok';
 
 done_testing;
 
