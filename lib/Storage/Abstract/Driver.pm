@@ -101,7 +101,10 @@ sub store
 {
 	my ($self, $name, $handle) = @_;
 
-	Storage::Abstract::X::StorageError->raise("storage is readonly")
+	Storage::Abstract::X::HandleError->raise('argument is not a handle')
+		unless defined fileno $handle;
+
+	Storage::Abstract::X::StorageError->raise('storage is readonly')
 		if $self->readonly;
 
 	$self->store_impl($self->resolve_path($name), $handle);

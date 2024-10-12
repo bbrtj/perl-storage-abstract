@@ -1,5 +1,6 @@
 use Test2::V0;
 use Storage::Abstract;
+use Data::Dumper;
 
 use lib 't/lib';
 use Storage::Abstract::Test;
@@ -26,8 +27,10 @@ ok $storage->is_stored('wiki.html'), 'wiki.html stored ok';
 ok $storage->is_stored('utf8.txt'), 'utf8 stored ok';
 ok !$storage->is_stored('foo'), 'foo not stored ok';
 
-$storage->store('foo', get_testfile_handle);
-ok $storage->is_stored('foo'), 'foo stored ok';
+ok lives {
+	$storage->store('foo', get_testfile_handle);
+	ok $storage->is_stored('foo'), 'foo stored ok';
+} or diag(Dumper($storage->driver->errors));
 
 ok !$storage->driver->sources->[0]->is_stored('foo'), 'not stored in readonly driver ok';
 ok $storage->driver->sources->[1]->is_stored('foo'), 'stored in memory driver ok';

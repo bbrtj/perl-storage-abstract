@@ -15,6 +15,7 @@ has param 'driver' => (
 			store
 			is_stored
 			retrieve
+			readonly
 		)
 	],
 );
