@@ -13,8 +13,10 @@ use Scalar::Util qw(blessed);
 extends 'Storage::Abstract::Driver';
 
 has param 'sources' => (
-	coerce =>
-		ArrayRef [(InstanceOf ['Storage::Abstract'])->plus_coercions(HashRef, q{ Storage::Abstract->new(%$_) }),],
+	coerce => ArrayRef [
+		(InstanceOf ['Storage::Abstract'])
+		->plus_coercions(HashRef, q{ Storage::Abstract->new(%$_) })
+	],
 );
 
 has field 'errors' => (
