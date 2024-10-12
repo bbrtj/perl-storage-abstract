@@ -1,8 +1,11 @@
 use Test2::V0;
 use Storage::Abstract;
 
+use lib 't/lib';
+use Storage::Abstract::Test;
+
 ################################################################################
-# This tests whether you can store in a readonly driver
+# This tests whether it's impossible to store in a readonly driver
 ################################################################################
 
 my $storage = Storage::Abstract->new(
@@ -10,10 +13,7 @@ my $storage = Storage::Abstract->new(
 	readonly => 1,
 );
 
-# test "file"
-my $content = "test file\nline2\nline3\n\n";
-open my $fh, '<', \$content
-	or die "could not open file handle from scalar: $!";
+my $fh = get_testfile_handle;
 
 my $err = dies {
 	$storage->store('some/file', $fh);

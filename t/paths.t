@@ -52,11 +52,11 @@ subtest 'path is trying to leave root' => sub {
 
 # test valid paths
 subtest 'path is valid and stored' => sub {
-	is $storage->is_stored('a/b/c/d'), F(), 'stored ok';
-	is $storage->is_stored('/a/b/c/d'), F(), 'stored ok';
-	is $storage->is_stored('./a/b/c/d'), F(), 'stored ok';
-	is $storage->is_stored('a/b/c/d/../d'), F(), 'stored ok';
-	is $storage->is_stored('./a/../a/b/../b/c/../c/././d'), F(), 'stored ok';
+	ok !$storage->is_stored('a/b/c/d'), 'stored ok';
+	ok !$storage->is_stored('/a/b/c/d'), 'stored ok';
+	ok !$storage->is_stored('./a/b/c/d'), 'stored ok';
+	ok !$storage->is_stored('a/b/c/d/../d'), 'stored ok';
+	ok !$storage->is_stored('./a/../a/b/../b/c/../c/././d'), 'stored ok';
 };
 
 done_testing;
