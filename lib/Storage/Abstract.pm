@@ -38,7 +38,10 @@ around BUILDARGS => sub {
 sub load_driver
 {
 	my ($class, $args) = @_;
-	my $name = ucfirst(delete $args->{driver} // 'Directory');
+	my $driver = delete $args->{driver};
+	die 'driver is required in Storage::Abstract' unless defined $driver;
+
+	my $name = ucfirst $driver;
 	my $full_namespace = "Storage::Abstract::Driver::$name";
 
 	(my $file_path = $full_namespace) =~ s{::}{/}g;
