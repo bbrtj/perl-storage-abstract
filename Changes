@@ -2,6 +2,10 @@ Revision history for Storage-Abstract
 
 {{$NEXT}}
 
+0.002 - 2024-10-13
+	- Added 'size' to list of common properties
+	- Added 'list' delegated method to Storage::Abstract
+
 0.001 - 2024-10-13
 	- First version
 
