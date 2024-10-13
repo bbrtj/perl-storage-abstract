@@ -57,6 +57,13 @@ sub dispose_impl
 	delete $self->files->{$name};
 }
 
+sub list_impl
+{
+	my ($self) = @_;
+
+	return [keys %{$self->files}];
+}
+
 1;
 
 __END__

@@ -31,6 +31,11 @@ sub dispose_impl
 	# will never be called
 }
 
+sub list_impl
+{
+	return [];
+}
+
 1;
 
 __END__

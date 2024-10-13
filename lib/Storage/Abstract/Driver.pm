@@ -165,6 +165,13 @@ sub dispose_impl
 	...;
 }
 
+sub list_impl
+{
+	my ($self) = @_;
+
+	...;
+}
+
 # PUBLIC INTERFACE
 
 sub store
@@ -217,6 +224,13 @@ sub dispose
 
 	$self->dispose_impl($path);
 	return;
+}
+
+sub list
+{
+	my ($self) = @_;
+
+	return $self->list_impl;
 }
 
 1;
@@ -341,6 +355,13 @@ The implementation of disposing a file. First argument is a normalized path.
 
 It should not check C<is_stored> - it will never be called without checking
 C<is_stored> first. Its return value will be ignored.
+
+=item * C<list_impl>
+
+	list_impl($path)
+
+The implementation of getting a list of files. Should return an array reference
+with file names (in Unix format).
 
 =back
 

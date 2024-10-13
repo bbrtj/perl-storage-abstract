@@ -50,7 +50,7 @@ sub _run_on_sources
 	my @errors;
 
 	# run on one cached source
-	my $cached_source = $self->_cache->{$name};
+	my $cached_source = defined $name ? $self->_cache->{$name} : undef;
 	if ($cached_source) {
 		$finished = $self->_run_on_source($callback, $cached_source, \@errors);
 	}
@@ -61,7 +61,8 @@ sub _run_on_sources
 		@errors = ();
 		foreach my $source (@{$self->sources}) {
 			if ($finished = $self->_run_on_source($callback, $source, \@errors)) {
-				$self->_cache->{$name} = $source;
+				$self->_cache->{$name} = $source
+					if defined $name;
 				last;
 			}
 		}
@@ -153,6 +154,27 @@ sub dispose_impl
 
 	Storage::Abstract::X::StorageError->raise("Could not dispose $name")
 		unless $disposed;
+}
+
+sub list_impl
+{
+	my ($self) = @_;
+
+	my %all_files;
+	$self->_run_on_sources(
+		undef,
+		sub {
+			my $source = shift;
+
+			foreach my $filename (@{$source->list}) {
+				$all_files{$filename} = 1;
+			}
+
+			return !!0;
+		}
+	);
+
+	return [keys %all_files];
 }
 
 1;

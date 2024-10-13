@@ -17,6 +17,7 @@ has param 'driver' => (
 			is_stored
 			retrieve
 			dispose
+			list
 
 			readonly
 			set_readonly
@@ -66,6 +67,7 @@ Storage::Abstract - Abstraction for file storage
 		directory => '/my/directory',
 	);
 
+	my $all_filenames = $storage->list;
 	$storage->store('some/file', 'local_filename');
 	$storage->store('some/file', \'file_content');
 	$storage->store('some/file', $open_filehandle);
@@ -280,6 +282,14 @@ Removes file C<$path> from the storage.
 
 It treats missing files as an error, so if no exception occurs you can be sure
 that the removal was performed.
+
+=head3 list
+
+	my $filenames_aref = $obj->list;
+
+Lists the names of all files existing in the storage in an array reference.
+
+This may be a costly operation (depending on the driver), so use it sparingly.
 
 =head3 readonly
 

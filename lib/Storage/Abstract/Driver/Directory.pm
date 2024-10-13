@@ -26,6 +26,19 @@ has param 'directory' => (
 	isa => SimpleStr->where(q{-d}),
 );
 
+sub get_list
+{
+	my ($self, $dir) = @_;
+	my @files = File::Spec->no_upwards(glob File::Spec->catfile($dir, '*'));
+	my @directories = grep { -d } @files;
+	@files = (
+		(grep { !-d } @files),
+		(map { $self->get_list($_) } @directories),
+	);
+
+	return @files;
+}
+
 sub resolve_path
 {
 	my ($self, $name) = @_;
@@ -92,6 +105,21 @@ sub dispose_impl
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
 }
 
+sub list_impl
+{
+	my ($self) = @_;
+
+	my $basedir = $self->directory;
+	my @all_files = $self->get_list($basedir);
+	foreach my $file (@all_files) {
+		$file = File::Spec->abs2rel($file, $basedir);
+		my @parts = File::Spec->splitdir($file);
+		$file = $self->SUPER::resolve_path(join Storage::Abstract::Driver::DIRSEP_STR, @parts);
+	}
+
+	return \@all_files;
+}
+
 1;
 
 __END__
@@ -121,5 +149,6 @@ contain any OS-specific syntax in them, an exception will be thrown.
 =head3 directory
 
 B<Required> - A string path to a directory which will serve as root. The
-directory must already exist when the object is built.
+directory must already exist when the object is built. This should be in format
+specific to the filesystem.
 

@@ -4,6 +4,7 @@ use Data::Dumper;
 
 use lib 't/lib';
 use Storage::Abstract::Test;
+use File::Spec;
 
 ################################################################################
 # This tests the composite driver
@@ -14,7 +15,7 @@ my $storage = Storage::Abstract->new(
 	sources => [
 		{
 			driver => 'directory',
-			directory => 't/testfiles',
+			directory => File::Spec->catdir(File::Spec->curdir, qw(t testfiles)),
 			readonly => !!1,
 		},
 		Storage::Abstract->new(
@@ -40,6 +41,17 @@ is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('pag
 $storage->retrieve('foo', \my %info);
 is $info{mtime}, within(time, 3), 'mtime ok';
 is $info{size}, get_testfile_size, 'size ok';
+
+is $storage->list, bag {
+	item 'foo';
+	item 'page.html';
+	item 'utf8.txt';
+	item 'deeply/nested.txt';
+	item 'deeply/nested/file.txt';
+
+	end();
+},
+	'file list ok';
 
 $storage->dispose('foo');
 ok !$storage->is_stored('foo'), 'foo disposed ok';
