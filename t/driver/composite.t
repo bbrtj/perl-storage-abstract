@@ -40,5 +40,12 @@ is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('pag
 $storage->dispose('foo');
 ok !$storage->is_stored('foo'), 'foo disposed ok';
 
+# check if various driver-specific methods exist
+ok lives {
+	$storage->driver->sources;
+	$storage->driver->errors;
+	$storage->driver->clear_cache;
+};
+
 done_testing;
 

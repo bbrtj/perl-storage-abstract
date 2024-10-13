@@ -27,7 +27,8 @@ has field 'errors' => (
 
 has field '_cache' => (
 	isa => HashRef,
-	default => sub { {} },
+	clearer => -public,
+	lazy => sub { {} },
 );
 
 sub _run_on_source
@@ -139,6 +140,7 @@ sub dispose_impl
 		$name,
 		sub {
 			my $source = shift;
+			return !!0 if $source->readonly;
 
 			if ($source->is_stored($name)) {
 				$source->dispose($name);
