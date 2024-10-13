@@ -20,7 +20,7 @@ sub store_impl
 	my ($self, $name, $handle) = @_;
 	my $files = $self->files;
 
-	$files->{$name}{properties} = $self->common_properties;
+	$files->{$name}{properties} = $self->common_properties($handle);
 
 	open my $fh, '>:raw', \$files->{$name}{content}
 		or Storage::Abstract::X::StorageError->raise("Could not open storage: $!");

@@ -37,6 +37,10 @@ ok $storage->driver->sources->[1]->is_stored('foo'), 'stored in memory driver ok
 
 is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('page.html')), 'new file ok';
 
+$storage->retrieve('foo', \my %info);
+is $info{mtime}, within(time, 3), 'mtime ok';
+is $info{size}, 14007, 'size ok';
+
 $storage->dispose('foo');
 ok !$storage->is_stored('foo'), 'foo disposed ok';
 

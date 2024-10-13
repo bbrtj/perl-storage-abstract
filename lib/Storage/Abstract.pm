@@ -195,6 +195,10 @@ Currently, only the following keys are guaranteed to be included for all drivers
 
 =over
 
+=item = C<size>
+
+The size of the data in the returned handle, in bytes.
+
 =item * C<mtime>
 
 Last modification unix timestamp of the file.

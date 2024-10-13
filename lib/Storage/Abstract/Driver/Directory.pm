@@ -76,6 +76,7 @@ sub retrieve_impl
 	if ($properties) {
 		my @stat = stat $name;
 		%{$properties} = (
+			size => $stat[7],
 			mtime => $stat[9],
 		);
 	}

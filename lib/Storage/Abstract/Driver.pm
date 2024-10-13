@@ -113,9 +113,24 @@ sub copy_handle
 
 sub common_properties
 {
-	my ($self) = @_;
+	my ($self, $handle) = @_;
+	my $size = do {
+		if (fileno $handle == -1) {
+			my $success = (my $pos = tell $handle) >= 0;
+			$success &&= seek $handle, 0, 2;
+			$success &&= (my $res = tell $handle) >= 0;
+			$success &&= seek $handle, $pos, 0;
+
+			$success or Storage::Abstract::X::HandleError->raise($!);
+			$res;
+		}
+		else {
+			-s $handle;
+		}
+	};
 
 	return {
+		size => $size,
 		mtime => time,
 	};
 }
@@ -277,11 +292,12 @@ C<print>. Use this to move data between filehandles in driver classes.
 
 =head3 common_properties
 
-	my $properties = $obj->common_properties;
+	my $properties = $obj->common_properties($handle);
 
 This returns a hash reference containing a list of properties with default
-values. Currently, the only property avialible in all the drivers is C<mtime> -
-modification time.
+values. Note that this does not get all these properties from C<$handle>, but
+instead produces a new list of properties for drivers which must create it
+themselves (like L<Storage::Abstract::Driver::Memory>).
 
 =head2 Implementation methods
 
