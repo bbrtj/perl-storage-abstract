@@ -197,7 +197,7 @@ Currently, only the following keys are guaranteed to be included for all drivers
 
 =over
 
-=item = C<size>
+=item * C<size>
 
 The size of the data in the returned handle, in bytes.
 
@@ -288,6 +288,7 @@ that the removal was performed.
 	my $filenames_aref = $obj->list;
 
 Lists the names of all files existing in the storage in an array reference.
+These names will be forced to the normalized form.
 
 This may be a costly operation (depending on the driver), so use it sparingly.
 
