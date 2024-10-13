@@ -103,6 +103,8 @@ This module lets you store and retrieve files from various places with a
 unified API. Its main purpose is to abstract away file storage, so that you
 only have to handle high-level operations without worrying about details.
 
+B<BETA QUALITY>: The interface is not yet stable before version C<1.000>.
+
 =head2 Drivers
 
 When creating an instance of this module, you need to pass L</driver> and any
