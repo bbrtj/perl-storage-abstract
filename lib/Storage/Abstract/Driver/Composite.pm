@@ -6,6 +6,7 @@ use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
+use namespace::autoclean;
 
 use Feature::Compat::Try;
 use Scalar::Util qw(blessed);

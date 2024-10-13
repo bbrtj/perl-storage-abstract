@@ -6,6 +6,7 @@ use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
+use namespace::autoclean;
 
 has param 'driver' => (
 	coerce => (InstanceOf ['Storage::Abstract::Driver'])
