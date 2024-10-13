@@ -84,7 +84,7 @@ access, you can make use of dynamic C<readonly>:
 	$storage->set_readonly(0);
 	$storage->store('path1', 'file1');
 	$storage->store('path2', 'file2');
-	$storage>set_readonly(1);
+	$storage->set_readonly(1);
 
 =head1 CUSTOM INTERFACE
 

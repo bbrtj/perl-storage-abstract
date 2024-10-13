@@ -289,21 +289,21 @@ These methods must be reimplemented in driver classes:
 
 =over
 
-=item * store_impl
+=item * C<store_impl>
 
 	store_impl($path, $fh)
 
 The implementation of storing a new file in the storage. It will be passed a
 normalized path and an opened file handle. Its return value will be ignored.
 
-=item * is_stored_impl
+=item * C<is_stored_impl>
 
 	is_stored_impl($path)
 
 The implementation of checking whether a file is stored. It will be passed a
 normalized path. Must return a boolean.
 
-=item * retrieve_impl
+=item * C<retrieve_impl>
 
 	retrieve_impl($path, \%properties)
 
@@ -317,7 +317,7 @@ L</common_properties>.
 It should not check C<is_stored> - it will never be called without checking
 C<is_stored> first. Must return an opened file handle to the file.
 
-=item * dispose_impl
+=item * C<dispose_impl>
 
 	dispose_impl($path)
 
