@@ -35,3 +35,18 @@ sub dispose_impl
 
 __END__
 
+=head1 NAME
+
+Storage::Abstract::Driver::Null - Driver which does nothing
+
+=head1 SYNOPSIS
+
+	my $storage = Storage::Abstract->new(
+		driver => 'null',
+	);
+
+=head1 DESCRIPTION
+
+This driver does nothing. It will silently skip storing any files, and will
+never return C<is_stored> as true for any path.
+

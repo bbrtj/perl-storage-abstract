@@ -79,3 +79,79 @@ package Storage::Abstract::X::StorageError {
 
 __END__
 
+=head1 NAME
+
+Storage::Abstract::X - Exceptions for Storage::Abstract
+
+=head1 SYNOPSIS
+
+	try {
+		my $fh = $storage->retrieve('some/file');
+	}
+	catch ($e) {
+		# $e is (usually) one of subclasses of Storage::Abstract::X
+	}
+
+
+=head1 DESCRIPTION
+
+This is a small exception module for L<Storage::Abstract>. It can stringify
+automatically and keeps a L</caller> and a L</message>.
+
+=head2 Subclasses
+
+=head3 NotFound
+
+This exception is raised when a file is not found.
+
+=head3 PathError
+
+This exception is raised when a path passed in a method call is not well formed.
+
+=head3 HandleError
+
+This exception is raised when there is a problem with the handle passed to a
+method call or created from data passed to a method call.
+
+=head3 StorageError
+
+This exception is raised when a problem occurs with the underlying file storage.
+
+=head1 INTERFACE
+
+=head2 Attributes
+
+=head3 message
+
+B<Required> - Human-readable description of the problem.
+
+=head3 caller
+
+A three-element array as returned by C<caller> Perl function. The module will
+try to find a caller most useful to the user - if it fails, this attribute will
+be C<undef>.
+
+It cannot be used in the constructor.
+
+=head2 Methods
+
+=head3 new
+
+	$ex = Storage::Abstract::X::NotFound->new(%args)
+
+Moose-flavored constructor.
+
+=head3 raise
+
+	Storage::Abstract::X::NotFound->raise($message)
+	$ex->raise;
+
+Same as calling C<< die $class->new(message => $message) >>. If there is no
+C<$message> then it must be called on an object instance.
+
+=head3 as_string
+
+	$string = $ex->as_string()
+
+Method used to stringify the exception.
+

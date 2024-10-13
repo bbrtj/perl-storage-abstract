@@ -95,3 +95,30 @@ sub dispose_impl
 
 __END__
 
+=head1 NAME
+
+Storage::Abstract::Driver::Directory - Local directory storage
+
+=head1 SYNOPSIS
+
+	my $storage = Storage::Abstract->new(
+		driver => 'directory',
+		directory => '/path/to/dir',
+	);
+
+=head1 DESCRIPTION
+
+This driver will store files in a local directory.
+
+Driver will perform mapping of paths from Unix to local OS. If the paths
+contain any OS-specific syntax in them, an exception will be thrown.
+
+=head1 CUSTOM INTERFACE
+
+=head2 Attributes
+
+=head3 directory
+
+B<Required> - A string path to a directory which will serve as root. The
+directory must already exist when the object is built.
+
