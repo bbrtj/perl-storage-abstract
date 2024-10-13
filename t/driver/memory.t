@@ -22,7 +22,7 @@ my $fh2 = $storage->retrieve('some/file', \my %info);
 
 is slurp_handle($fh2), slurp_handle(get_testfile_handle), 'content ok';
 is $info{mtime}, within(time, 3), 'mtime ok';
-is $info{size}, 14007, 'size ok';
+is $info{size}, get_testfile_size, 'size ok';
 
 $storage->dispose('/some/file');
 ok !$storage->is_stored('/some/file'), 'foo disposed ok';

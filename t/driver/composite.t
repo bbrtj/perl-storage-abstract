@@ -39,7 +39,7 @@ is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('pag
 
 $storage->retrieve('foo', \my %info);
 is $info{mtime}, within(time, 3), 'mtime ok';
-is $info{size}, 14007, 'size ok';
+is $info{size}, get_testfile_size, 'size ok';
 
 $storage->dispose('foo');
 ok !$storage->is_stored('foo'), 'foo disposed ok';

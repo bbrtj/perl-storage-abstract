@@ -19,7 +19,7 @@ open my $fh, '<', \$content
 $storage->store('foo', $fh);
 my $fh2 = $storage->retrieve('foo', \my %info);
 
-is $info{size}, 13, 'size ok';
+is $info{size}, length $content, 'size ok';
 is slurp_handle($fh2), $content, 'content ok';
 
 done_testing;

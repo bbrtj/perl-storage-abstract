@@ -9,6 +9,7 @@ use File::Spec;
 use Exporter qw(import);
 our @EXPORT = qw(
 	get_testfile
+	get_testfile_size
 	get_testfile_handle
 	slurp_handle
 );
@@ -21,6 +22,14 @@ sub get_testfile
 	$name //= 'page.html';
 
 	return File::Spec->catdir(@testdir, $name);
+}
+
+sub get_testfile_size
+{
+	my ($name) = @_;
+
+	my $file = get_testfile($name);
+	return -s $file;
 }
 
 sub get_testfile_handle
