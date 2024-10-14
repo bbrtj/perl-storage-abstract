@@ -26,14 +26,30 @@ has param 'driver' => (
 );
 
 around BUILDARGS => sub {
-	my ($orig, $self, @args) = @_;
+	my ($orig, $self, @raw_args) = @_;
+	my %args;
 
-	return $self->$orig(@args)
-		unless @args % 2 == 0;
+	if (@raw_args == 1 && ref $raw_args[0] eq 'HASH') {
+		%args = %{$raw_args[0]};
+	}
+	else {
+		%args = @raw_args;
+	}
 
-	return $self->$orig(
-		driver => {@args},
-	);
+	my %other_args = %args;
+	%args = ();
+	foreach my $base_key (qw(driver)) {
+		$args{$base_key} = delete $other_args{$base_key};
+	}
+
+	if (!ref $args{driver}) {
+		$args{driver} = {
+			driver => $args{driver},
+			%other_args,
+		};
+	}
+
+	return $self->$orig(%args);
 };
 
 sub load_driver
@@ -222,6 +238,8 @@ will point to L<Storage::Abstract::Driver::Directory>. First letter of the
 driver will be capitalized.
 
 After the object is created, this will point to an instance of the driver.
+Alternatively, an already constructed driver object can be passed, and will be
+used as-is.
 
 =head2 Methods
 
@@ -230,6 +248,7 @@ These are common methods not dependant on a driver.
 =head3 new
 
 	$obj = Storage::Abstract->new(%args);
+	$obj = Storage::Abstract->new(\%args);
 
 Moose-flavoured constructor, but C<%args> will be used to construct the driver
 rather than this class.
