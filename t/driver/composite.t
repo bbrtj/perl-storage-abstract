@@ -1,6 +1,5 @@
 use Test2::V0;
 use Storage::Abstract;
-use Data::Dumper;
 
 use lib 't/lib';
 use Storage::Abstract::Test;
@@ -31,7 +30,11 @@ ok !$storage->is_stored('foo'), 'foo not stored ok';
 ok lives {
 	$storage->store('foo', get_testfile_handle);
 	ok $storage->is_stored('foo'), 'foo stored ok';
-} or diag(Dumper($storage->driver->errors));
+};
+
+isa_ok dies {
+	$storage->retrieve('bar');
+}, 'Storage::Abstract::X::NotFound';
 
 ok !$storage->driver->sources->[0]->is_stored('foo'), 'not stored in readonly driver ok';
 ok $storage->driver->sources->[1]->is_stored('foo'), 'stored in memory driver ok';
@@ -50,8 +53,7 @@ is $storage->list, bag {
 	item 'deeply/nested/file.txt';
 
 	end();
-},
-	'file list ok';
+}, 'file list ok';
 
 $storage->dispose('foo');
 ok !$storage->is_stored('foo'), 'foo disposed ok';
@@ -59,7 +61,6 @@ ok !$storage->is_stored('foo'), 'foo disposed ok';
 # check if various driver-specific methods exist
 ok lives {
 	$storage->driver->sources;
-	$storage->driver->errors;
 	$storage->driver->clear_cache;
 };
 

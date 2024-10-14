@@ -8,7 +8,6 @@ use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
 use namespace::autoclean;
 
-use Feature::Compat::Try;
 use Scalar::Util qw(blessed);
 
 extends 'Storage::Abstract::Driver';
@@ -16,13 +15,8 @@ extends 'Storage::Abstract::Driver';
 has param 'sources' => (
 	coerce => ArrayRef [
 		(InstanceOf ['Storage::Abstract'])
-		->plus_coercions(HashRef, q{ Storage::Abstract->new(%$_) })
+		->plus_coercions(HashRef, q{ Storage::Abstract->new($_) })
 	],
-);
-
-has field 'errors' => (
-	isa => ArrayRef,
-	writer => -hidden,
 );
 
 has field '_cache' => (
@@ -31,45 +25,27 @@ has field '_cache' => (
 	lazy => sub { {} },
 );
 
-sub _run_on_source
-{
-	my ($self, $callback, $source, $errors) = @_;
-	try {
-		return $callback->($source);
-	}
-	catch ($e) {
-		push @$errors, [$source, $e];
-		return !!0;
-	}
-}
-
 sub _run_on_sources
 {
 	my ($self, $name, $callback) = @_;
 	my $finished = !!0;
-	my @errors;
 
 	# run on one cached source
 	my $cached_source = defined $name ? $self->_cache->{$name} : undef;
 	if ($cached_source) {
-		$finished = $self->_run_on_source($callback, $cached_source, \@errors);
+		$finished = $callback->($cached_source);
 	}
 
 	# if there was no cached source or $callback did not return true, do it on
 	# all sources
 	if (!$finished) {
-		@errors = ();
 		foreach my $source (@{$self->sources}) {
-			if ($finished = $self->_run_on_source($callback, $source, \@errors)) {
+			if ($finished = $callback->($source)) {
 				$self->_cache->{$name} = $source
 					if defined $name;
 				last;
 			}
 		}
-	}
-
-	if (@errors) {
-		$self->_set_errors(\@errors);
 	}
 
 	return $finished;
@@ -229,10 +205,6 @@ If the source doesn't report having this file (as with C<is_stored>), skip it
 
 =item
 
-If the source encounters an exception, write it into L</errors> and skip it.
-
-=item
-
 If the source was not skipped in the previous steps, use it.
 
 =back
@@ -241,9 +213,12 @@ After the first successful pairing of a path with a source, it will be cached.
 Future operations on this path will prefer to use the cached source, but if
 they were to fail, they will fall back to checking all sources once again.
 
-Unless you want to possibly have duplicated files in your sources (due to the
-driver falling back to other sources on exceptions), you should mark all but
-one nested drivers as readonly.
+If any source raises an exception, the execution will stop since it will not be
+caught. Driver will check if the sources have the files stored explicitly, so
+C<NotFound> exception should not be raised unless no sources store that file.
+
+Unless you want to possibly have duplicated files in your sources, you should
+mark all but one nested drivers as readonly.
 
 =head1 CUSTOM INTERFACE
 
@@ -255,19 +230,6 @@ B<Required> - An array reference of L<Storage::Abstract> instances. Each
 instance be coerced from a hash reference, which will be used to call
 L<Storage::Abstract/new>. Their order is significant - they will be tried in
 sequence.
-
-=head3 errors
-
-This is an array reference which will be populated with source errors if they
-occur. Each element in the array will be an array reference of two elements -
-the first element will be the source instance from L</sources>, while the
-second one will be the exception which was caught.
-
-This structure can be examined to see whether any of the sources encountered
-errors when performing their operations. It's probably wise to examine it when
-catching C<Storage::Abstract::X::StorageError>.
-
-It cannot be set in the constructor, obviously.
 
 =head2 Methods
 
