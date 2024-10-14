@@ -1,6 +1,8 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+
+0.003 - 2024-10-14
 	- Added subpath driver
 	- Improved constructor behavior with hash references and driver instances
 	- Driver name can now be prefixed with + to force full custom namespace
