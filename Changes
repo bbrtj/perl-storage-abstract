@@ -1,9 +1,10 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+	- Added subpath driver
 	- Improved constructor behavior with hash references and driver instances
 	- Driver name can now be prefixed with + to force full custom namespace
-	- Change the behavior of Composite driver
+	- Changed the behavior of Composite driver
 		- no longer catches errors raised in its sources
 		- will not fall back to other sources if one of the sources encounters a problem
 		- errors field was removed

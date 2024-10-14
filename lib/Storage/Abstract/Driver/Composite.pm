@@ -159,7 +159,7 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Composite - Aggregate multiple storages
+Storage::Abstract::Driver::Composite - Aggregate metadriver
 
 =head1 SYNOPSIS
 
@@ -227,7 +227,7 @@ mark all but one nested drivers as readonly.
 =head3 source
 
 B<Required> - An array reference of L<Storage::Abstract> instances. Each
-instance be coerced from a hash reference, which will be used to call
+instance can be coerced from a hash reference, which will be used to call
 L<Storage::Abstract/new>. Their order is significant - they will be tried in
 sequence.
 

@@ -146,7 +146,7 @@ chosen driver, this module only contains methods which delegate to same methods
 of the driver.
 
 There are drivers and metadrivers. Metadrivers do not implement any file
-storage by themselves, but rather change the way other drivers work. The module
+storage by themselves, but rather change the way other storages work. The module
 comes with the following driver implementations:
 
 =over
@@ -161,8 +161,14 @@ This driver stores the files in a local machine's directory.
 
 =item * L<Storage::Abstract::Driver::Composite>
 
-This metadriver can be configured to keep a couple other drivers at once and
+This metadriver can be configured to keep a couple source storages at once and
 use them all in sequence until it finds a file.
+
+=item * L<Storage::Abstract::Driver::Subpath>
+
+This metadriver is useful when you want to have a modify the base path of
+another storage, to restrict access or adapt a path (for example for HTTP
+public directory).
 
 =item * L<Storage::Abstract::Driver::Null>
 
