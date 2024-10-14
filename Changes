@@ -7,6 +7,7 @@ Revision history for Storage-Abstract
 		- no longer catches errors raised in its sources
 		- will not fall back to other sources if one of the sources encounters a problem
 		- errors field was removed
+		- sources field was renamed to source
 	- Removed Feature::Compat::Try dependency
 
 0.002 - 2024-10-13

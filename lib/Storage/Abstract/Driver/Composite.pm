@@ -12,18 +12,18 @@ use Scalar::Util qw(blessed);
 
 extends 'Storage::Abstract::Driver';
 
-has param 'sources' => (
-	coerce => ArrayRef [
-		(InstanceOf ['Storage::Abstract'])
-		->plus_coercions(HashRef, q{ Storage::Abstract->new($_) })
-	],
-);
-
 has field '_cache' => (
 	isa => HashRef,
 	clearer => -public,
 	lazy => sub { {} },
 );
+
+with 'Storage::Abstract::Role::Metadriver';
+
+sub source_is_array
+{
+	return !!1;
+}
 
 sub _run_on_sources
 {
@@ -39,7 +39,7 @@ sub _run_on_sources
 	# if there was no cached source or $callback did not return true, do it on
 	# all sources
 	if (!$finished) {
-		foreach my $source (@{$self->sources}) {
+		foreach my $source (@{$self->source}) {
 			if ($finished = $callback->($source)) {
 				$self->_cache->{$name} = $source
 					if defined $name;
@@ -159,13 +159,13 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Composite - Use multiple sources of storage
+Storage::Abstract::Driver::Composite - Aggregate multiple storages
 
 =head1 SYNOPSIS
 
 	my $storage = Storage::Abstract->new(
 		driver => 'composite',
-		sources => [
+		source => [
 			{
 				driver => 'directory',
 				directory => '/some/dir',
@@ -191,7 +191,7 @@ retrieve a file:
 
 =item
 
-Check the L</sources> array in order, starting from index 0.
+Check the L</source> array in order, starting from index 0.
 
 =item
 
@@ -224,7 +224,7 @@ mark all but one nested drivers as readonly.
 
 =head2 Attributes
 
-=head3 sources
+=head3 source
 
 B<Required> - An array reference of L<Storage::Abstract> instances. Each
 instance be coerced from a hash reference, which will be used to call

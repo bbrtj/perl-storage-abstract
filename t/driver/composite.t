@@ -11,7 +11,7 @@ use File::Spec;
 
 my $storage = Storage::Abstract->new(
 	driver => 'composite',
-	sources => [
+	source => [
 		{
 			driver => 'directory',
 			directory => File::Spec->catdir(File::Spec->curdir, qw(t testfiles)),
@@ -36,8 +36,8 @@ isa_ok dies {
 	$storage->retrieve('bar');
 }, 'Storage::Abstract::X::NotFound';
 
-ok !$storage->driver->sources->[0]->is_stored('foo'), 'not stored in readonly driver ok';
-ok $storage->driver->sources->[1]->is_stored('foo'), 'stored in memory driver ok';
+ok !$storage->driver->source->[0]->is_stored('foo'), 'not stored in readonly driver ok';
+ok $storage->driver->source->[1]->is_stored('foo'), 'stored in memory driver ok';
 
 is slurp_handle($storage->retrieve('foo')), slurp_handle($storage->retrieve('page.html')), 'new file ok';
 
@@ -58,9 +58,7 @@ is $storage->list, bag {
 $storage->dispose('foo');
 ok !$storage->is_stored('foo'), 'foo disposed ok';
 
-# check if various driver-specific methods exist
 ok lives {
-	$storage->driver->sources;
 	$storage->driver->clear_cache;
 };
 
