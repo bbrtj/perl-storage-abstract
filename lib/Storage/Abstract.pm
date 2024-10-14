@@ -348,6 +348,10 @@ Sets the readonly status of the storage to a new value.
 
 Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
 
+=head1 ACKNOWLEDGEMENTS
+
+Thank you to Alexander Karelas for his feedback during module development.
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2024 by Bartosz Jarzyna
