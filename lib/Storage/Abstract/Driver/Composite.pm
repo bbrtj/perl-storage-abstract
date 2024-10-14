@@ -203,8 +203,8 @@ Storage::Abstract::Driver::Composite - Use multiple sources of storage
 
 =head1 DESCRIPTION
 
-This driver can hold a number of drivers under itself (in sequence) and choose
-the first driver which holds a given file.
+This metadriver can hold a number of drivers under itself (in sequence) and
+choose the first driver which holds a given file.
 
 =head2 Choosing the source
 

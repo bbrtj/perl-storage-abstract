@@ -145,7 +145,9 @@ extra attributes that driver need. All implementation details depend on the
 chosen driver, this module only contains methods which delegate to same methods
 of the driver.
 
-The module comes with the following driver implementations:
+There are drivers and metadrivers. Metadrivers do not implement any file
+storage by themselves, but rather change the way other drivers work. The module
+comes with the following driver implementations:
 
 =over
 
@@ -159,8 +161,8 @@ This driver stores the files in a local machine's directory.
 
 =item * L<Storage::Abstract::Driver::Composite>
 
-This driver can be configured to keep a couple other drivers at once and use
-them all in sequence until it finds a file.
+This metadriver can be configured to keep a couple other drivers at once and
+use them all in sequence until it finds a file.
 
 =item * L<Storage::Abstract::Driver::Null>
 
