@@ -2,6 +2,7 @@ Revision history for Storage-Abstract
 
 {{$NEXT}}
 	- Improved constructor behavior with hash references and driver instances
+	- Driver name can now be prefixed with + to force full custom namespace
 
 0.002 - 2024-10-13
 	- Added 'size' to list of common properties

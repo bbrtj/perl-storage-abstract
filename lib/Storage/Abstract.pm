@@ -54,16 +54,31 @@ around BUILDARGS => sub {
 
 sub load_driver
 {
-	my ($class, $args) = @_;
-	my $driver = delete $args->{driver};
+	my ($class, @raw_args) = @_;
+	my %args;
+
+	if (@raw_args == 1 && ref $raw_args[0] eq 'HASH') {
+		%args = %{$raw_args[0]};
+	}
+	else {
+		%args = @raw_args;
+	}
+
+	my $driver = delete $args{driver};
 	die 'driver is required in Storage::Abstract' unless defined $driver;
 
 	my $name = ucfirst $driver;
-	my $full_namespace = "Storage::Abstract::Driver::$name";
+	my $full_namespace;
+	if ($name =~ /^\+/) {
+		$full_namespace = substr $name, 1;
+	}
+	else {
+		$full_namespace = "Storage::Abstract::Driver::$name";
+	}
 
 	(my $file_path = $full_namespace) =~ s{::}{/}g;
 	require "$file_path.pm";
-	return $full_namespace->new($args);
+	return $full_namespace->new(%args);
 }
 
 1;
@@ -235,7 +250,9 @@ constructing the driver.
 B<Required> - This is the name of the driver to use. It must be a partial class
 name from namespace C<Storage::Abstract::Driver::>, for example C<Directory>
 will point to L<Storage::Abstract::Driver::Directory>. First letter of the
-driver will be capitalized.
+driver will be capitalized. If the name is prefixed with C<+>, the rest of the
+name will be used as full namespace without adding the standard prefix, same as
+in Plack.
 
 After the object is created, this will point to an instance of the driver.
 Alternatively, an already constructed driver object can be passed, and will be
@@ -255,10 +272,11 @@ rather than this class.
 
 =head3 load_driver
 
+	$driver_obj = Storage::Abstract->load_driver(%args);
 	$driver_obj = Storage::Abstract->load_driver(\%args);
 
-Loads the driver package and constructs the driver using C<%args>. Returns an
-instance of L<Storage::Abstract::Driver>.
+Loads the driver package and constructs the driver using C<%args> (same as in
+the constructor). Returns an instance of L<Storage::Abstract::Driver>.
 
 =head2 Delegated methods
 
