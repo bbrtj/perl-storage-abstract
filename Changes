@@ -1,6 +1,7 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+	- Added create_directory option to Directory driver
 
 0.003 - 2024-10-14
 	- Added subpath driver
