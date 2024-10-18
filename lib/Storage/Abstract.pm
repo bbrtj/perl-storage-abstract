@@ -166,7 +166,7 @@ use them all in sequence until it finds a file.
 
 =item * L<Storage::Abstract::Driver::Subpath>
 
-This metadriver is useful when you want to have a modify the base path of
+This metadriver is useful when you want to modify the base path of
 another storage, to restrict access or adapt a path (for example for HTTP
 public directory).
 

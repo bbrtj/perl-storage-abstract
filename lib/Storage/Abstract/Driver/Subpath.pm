@@ -98,7 +98,7 @@ Storage::Abstract::Driver::Subpath - Change root metadriver
 	# subpath of the file storage for public files
 	my $public_storage = Storage::Abstract->new(
 		driver => 'subpath',
-		source => $directory,
+		source => $storage,
 		subpath => '/public',
 	);
 
