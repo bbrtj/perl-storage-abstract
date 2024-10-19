@@ -1,6 +1,7 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+	- Added superpath driver
 
 0.005 - 2024-10-19
 	- Added X::Readonly, used to throw exception on readonly instead of X::StorageError

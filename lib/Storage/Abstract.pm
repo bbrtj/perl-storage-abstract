@@ -170,6 +170,11 @@ This metadriver is useful when you want to modify the base path of
 another storage, to restrict access or adapt a path (for example for HTTP
 public directory).
 
+=item * L<Storage::Abstract::Driver::Superpath>
+
+This metadriver does the opposite of C<subpath> - allows you to modify path of
+a storage to virtually put it into a nested directory as a whole.
+
 =item * L<Storage::Abstract::Driver::Null>
 
 This driver does nothing - it won't store or retrieve anything.
