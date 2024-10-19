@@ -1,6 +1,8 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+
+0.006 - 2024-10-19
 	- Added superpath driver
 
 0.005 - 2024-10-19
