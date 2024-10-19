@@ -185,7 +185,7 @@ sub store
 		$handle = $self->open_handle($handle);
 	}
 
-	Storage::Abstract::X::StorageError->raise('storage is readonly')
+	Storage::Abstract::X::Readonly->raise('storage is readonly')
 		if $self->readonly;
 
 	$self->store_impl($self->resolve_path($name), $handle);
@@ -214,7 +214,7 @@ sub dispose
 {
 	my ($self, $name) = @_;
 
-	Storage::Abstract::X::StorageError->raise('storage is readonly')
+	Storage::Abstract::X::Readonly->raise('storage is readonly')
 		if $self->readonly;
 
 	my $path = $self->resolve_path($name);

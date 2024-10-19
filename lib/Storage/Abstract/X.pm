@@ -64,6 +64,11 @@ package Storage::Abstract::X::NotFound {
 	use parent -norequire, 'Storage::Abstract::X';
 }
 
+package Storage::Abstract::X::Readonly {
+
+	use parent -norequire, 'Storage::Abstract::X';
+}
+
 package Storage::Abstract::X::PathError {
 
 	use parent -norequire, 'Storage::Abstract::X';

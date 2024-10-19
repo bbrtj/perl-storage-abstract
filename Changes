@@ -1,6 +1,7 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+	- Added X::Readonly, used to throw exception on readonly instead of X::StorageError
 
 0.004 - 2024-10-18
 	- Added create_directory option to Directory driver

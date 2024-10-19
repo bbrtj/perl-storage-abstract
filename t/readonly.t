@@ -21,7 +21,7 @@ subtest 'should not be able to store' => sub {
 		$storage->store('some/file', get_testfile_handle);
 	};
 
-	isa_ok $err, 'Storage::Abstract::X::StorageError';
+	isa_ok $err, 'Storage::Abstract::X::Readonly';
 	like $err, qr/is readonly/;
 };
 
@@ -30,7 +30,7 @@ subtest 'should not be able to dispose' => sub {
 		$storage->dispose('foo');
 	};
 
-	isa_ok $err, 'Storage::Abstract::X::StorageError';
+	isa_ok $err, 'Storage::Abstract::X::Readonly';
 	like $err, qr/is readonly/;
 };
 
