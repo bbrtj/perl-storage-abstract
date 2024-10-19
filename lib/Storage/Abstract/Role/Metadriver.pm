@@ -27,9 +27,13 @@ sub BUILD
 after BUILD => sub {
 	my ($self) = @_;
 
-	if ($self->source_is_array && ref $self->source ne 'ARRAY') {
-		my $class = ref $self;
-		die "$class source must be an array";
+	if ($self->source_is_array) {
+		die 'Source of ' . (ref $self) . ' must be an array'
+			unless ref $self->source eq 'ARRAY';
+	}
+	else {
+		die 'Source of ' . (ref $self) . ' must not be an array'
+			unless ref $self->source ne 'ARRAY';
 	}
 };
 
