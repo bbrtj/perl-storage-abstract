@@ -34,5 +34,28 @@ subtest 'should not be able to dispose' => sub {
 	like $err, qr/is readonly/;
 };
 
+my $metastorage = Storage::Abstract->new(
+	driver => 'Subpath',
+	source => $storage,
+	subpath => '/test',
+);
+
+ok $metastorage->readonly, 'readonly ok';
+
+$metastorage->set_readonly(0);
+ok !$metastorage->readonly, 'readonly removed ok';
+ok !$storage->readonly, 'readonly removed from source ok';
+
+$storage->set_readonly(1);
+ok $metastorage->readonly, 'readonly added to source ok';
+
+my $composite_metastorage = Storage::Abstract->new(
+	driver => 'composite',
+	source => [$storage],
+);
+
+ok $composite_metastorage->readonly, 'composite readonly ok';
+ok dies { $composite_metastorage->set_readonly(0) }, 'composite readonly setter dies ok';
+
 done_testing;
 

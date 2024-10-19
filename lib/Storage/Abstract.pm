@@ -350,6 +350,9 @@ exception on L</store> and L</dispose>.
 
 Sets the readonly status of the storage to a new value.
 
+This method does not work and throws an exception for metadrivers using
+multiple sources of storage, like L<Storage::Abstract::Driver::Composite>.
+
 =head1 AUTHOR
 
 Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>

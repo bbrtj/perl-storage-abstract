@@ -31,6 +31,8 @@ has param 'create_directory' => (
 	default => !!0,
 );
 
+with 'Storage::Abstract::Role::Driver';
+
 sub BUILD
 {
 	my ($self) = @_;

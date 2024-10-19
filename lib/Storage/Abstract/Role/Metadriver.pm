@@ -7,6 +7,8 @@ use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
 use Moo::Role;
 
+use List::Util qw(all);
+
 requires qw(
 	source_is_array
 );
@@ -36,6 +38,30 @@ after BUILD => sub {
 			unless ref $self->source ne 'ARRAY';
 	}
 };
+
+sub readonly
+{
+	my ($self) = @_;
+
+	if ($self->source_is_array) {
+		return all { $_->readonly } @{$self->source};
+	}
+	else {
+		return $self->source->readonly;
+	}
+}
+
+sub set_readonly
+{
+	my ($self, $new_value) = @_;
+
+	if ($self->source_is_array) {
+		die 'Driver of class ' . (ref $self) . ' holds multiple sources and cannot set_readonly';
+	}
+	else {
+		return $self->source->set_readonly($new_value);
+	}
+}
 
 1;
 

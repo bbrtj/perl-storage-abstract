@@ -10,6 +10,8 @@ use namespace::autoclean;
 
 extends 'Storage::Abstract::Driver';
 
+with 'Storage::Abstract::Role::Driver';
+
 sub store_impl
 {
 	# don't store anywhere

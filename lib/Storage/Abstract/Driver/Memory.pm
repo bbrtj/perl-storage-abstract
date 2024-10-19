@@ -15,6 +15,8 @@ has field 'files' => (
 	default => sub { {} },
 );
 
+with 'Storage::Abstract::Role::Driver';
+
 sub store_impl
 {
 	my ($self, $name, $handle) = @_;
