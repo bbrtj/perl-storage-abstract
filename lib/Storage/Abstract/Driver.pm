@@ -352,7 +352,12 @@ possible). Every driver should include at least the same keys as returned by
 L</common_properties>.
 
 It should not check C<is_stored> - it will never be called without checking
-C<is_stored> first. Must return an opened file handle to the file.
+C<is_stored> first. Must return an open file handle to the file. The file
+handle should be rewound to the beginning (ready to be read without calling
+C<seek>) and it should read data into memory lazily regardless of the
+underlying storage type. Calling C<retrieve_impl> by itself should not cause
+the storage to perform any IO operations, so that it can be used just to fetch
+C<%properties> efficiently.
 
 =item * C<dispose_impl>
 

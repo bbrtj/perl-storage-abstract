@@ -1,6 +1,7 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+	- Defined 'public_url' extension key in retrieve properties
 
 0.006 - 2024-10-19
 	- Added superpath driver

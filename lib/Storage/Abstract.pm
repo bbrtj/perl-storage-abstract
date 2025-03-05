@@ -235,7 +235,8 @@ It is recommended to close the returned handles as soon as possible.
 =head2 Properties
 
 This module can get additional file data when retrieving files. It is similar
-to calling C<stat> on a filehandle, but contains much less information.
+to calling C<stat> on a filehandle, but can contain extra information in
+addition to regular file metadata.
 
 Currently, only the following keys are guaranteed to be included for all drivers:
 
@@ -248,6 +249,24 @@ The size of the data in the returned handle, in bytes.
 =item * C<mtime>
 
 Last modification unix timestamp of the file.
+
+=back
+
+We define some extension keys which can be included by third party drivers
+if they are capable of providing them:
+
+=over
+
+=item * C<public_url>
+
+This is a public url of the resource. Such url can be served to the user
+directly, without the need for Storage::Abstract to act as a proxy. It can be
+useful if the driver fetches remote resources from services which are capable
+of serving those themselves.
+
+As a Storage::Abstract user, you can check the existence of this key before
+reading from the retrieved filehandle and choose whether you need to serve the
+file contents or just the url.
 
 =back
 
