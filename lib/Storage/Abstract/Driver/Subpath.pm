@@ -16,7 +16,7 @@ has param 'subpath' => (
 	writer => -hidden,
 );
 
-with 'Storage::Abstract::Role::Metadriver';
+with 'Storage::Abstract::Role::Driver::Meta';
 
 sub BUILD
 {
@@ -127,4 +127,10 @@ reference, which will be used to call L<Storage::Abstract/new>.
 =head3 subpath
 
 B<Required> - A path prefix for all paths passed to the L</source> driver.
+
+=head1 CAVEATS
+
+This driver caches the readonly state of its subdriver to make its behavior
+consistent with other metadrivers. You can call C<refresh> to make it
+recalculate the readonly state.
 

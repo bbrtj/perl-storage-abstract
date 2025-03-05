@@ -15,7 +15,7 @@ has field 'files' => (
 	default => sub { {} },
 );
 
-with 'Storage::Abstract::Role::Driver';
+with 'Storage::Abstract::Role::Driver::Basic';
 
 sub store_impl
 {

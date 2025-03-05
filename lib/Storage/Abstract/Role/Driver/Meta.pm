@@ -1,4 +1,4 @@
-package Storage::Abstract::Role::Metadriver;
+package Storage::Abstract::Role::Driver::Meta;
 
 use v5.14;
 use warnings;
@@ -39,7 +39,7 @@ after BUILD => sub {
 	}
 };
 
-sub readonly
+sub _build_readonly
 {
 	my ($self) = @_;
 
@@ -51,17 +51,33 @@ sub readonly
 	}
 }
 
-sub set_readonly
-{
-	my ($self, $new_value) = @_;
+around 'set_readonly' => sub {
+	my ($orig, $self, $new_value) = @_;
 
 	if ($self->source_is_array) {
 		die 'Driver of class ' . (ref $self) . ' holds multiple sources and cannot set_readonly';
 	}
 	else {
-		return $self->source->set_readonly($new_value);
+		$self->source->set_readonly($new_value);
+		return $self->$orig($new_value);
 	}
-}
+};
+
+after 'refresh' => sub {
+	my ($self) = @_;
+
+	# readonly is cached in metadrivers
+	$self->_clear_readonly;
+
+	if ($self->source_is_array) {
+		foreach my $source (@{$self->source}) {
+			$source->refresh;
+		}
+	}
+	else {
+		$self->source->refresh;
+	}
+};
 
 1;
 

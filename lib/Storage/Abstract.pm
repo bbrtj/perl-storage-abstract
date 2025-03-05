@@ -21,6 +21,7 @@ has param 'driver' => (
 
 			readonly
 			set_readonly
+			refresh
 		)
 	],
 );
@@ -376,6 +377,12 @@ Sets the readonly status of the storage to a new value.
 
 This method does not work and throws an exception for metadrivers using
 multiple sources of storage, like L<Storage::Abstract::Driver::Composite>.
+
+=head3 refresh
+
+	$obj->refresh()
+
+Clears any cached internal state of the driver.
 
 =head1 AUTHOR
 

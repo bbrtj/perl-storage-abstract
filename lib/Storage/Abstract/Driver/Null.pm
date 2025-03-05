@@ -10,7 +10,7 @@ use namespace::autoclean;
 
 extends 'Storage::Abstract::Driver';
 
-with 'Storage::Abstract::Role::Driver';
+with 'Storage::Abstract::Role::Driver::Basic';
 
 sub store_impl
 {

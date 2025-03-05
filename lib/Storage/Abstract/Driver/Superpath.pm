@@ -16,7 +16,7 @@ has param 'superpath' => (
 	writer => -hidden,
 );
 
-with 'Storage::Abstract::Role::Metadriver';
+with 'Storage::Abstract::Role::Driver::Meta';
 
 sub BUILD
 {
@@ -48,7 +48,7 @@ sub store_impl
 	my $new_path = $self->_adjust_path($path);
 
 	Storage::Abstract::X::Readonly->raise(
-		"file $path cannot be stored because it's outside of path " . $self->superpath
+		"file $path cannot be stored because it's outside of path '" . $self->superpath . "'"
 	) unless defined $new_path;
 
 	return $self->source->store($new_path, $handle);
@@ -151,4 +151,8 @@ most operations it just means it will act as if the file was not present, but
 for C<store> it will throw a C<Storage::Abstract::X::Readonly> instead (even
 though the storage may not report being readonly). For this reason, it works
 best when underlying storage is marked as C<readonly>.
+
+This driver caches the readonly state of its subdriver to make its behavior
+consistent with other metadrivers. You can call C<refresh> to make it
+recalculate the readonly state.
 

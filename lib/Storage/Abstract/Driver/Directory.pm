@@ -31,7 +31,7 @@ has param 'create_directory' => (
 	default => !!0,
 );
 
-with 'Storage::Abstract::Role::Driver';
+with 'Storage::Abstract::Role::Driver::Basic';
 
 sub BUILD
 {

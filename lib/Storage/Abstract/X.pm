@@ -12,6 +12,10 @@ use overload
 	q{""} => "as_string",
 	fallback => 1;
 
+has param 'path' => (
+	isa => Maybe [Str],
+);
+
 has param 'message' => (
 	isa => Str,
 	writer => -hidden,
@@ -28,12 +32,14 @@ has field 'caller' => (
 	},
 );
 
+our $path_context;
+
 sub raise
 {
 	my ($self, $error) = @_;
 
 	if (defined $error) {
-		$self = $self->new(message => $error);
+		$self = $self->new(message => $error, path => $path_context);
 	}
 
 	die $self;
@@ -45,6 +51,10 @@ sub as_string
 
 	my $raised = $self->message;
 	$raised =~ s/\s+\z//;
+
+	if (my $path = $self->path) {
+		$raised .= " for path '$path'";
+	}
 
 	if (my $caller = $self->caller) {
 		$raised .= ' (raised at ' . $caller->[1] . ', line ' . $caller->[2] . ')';

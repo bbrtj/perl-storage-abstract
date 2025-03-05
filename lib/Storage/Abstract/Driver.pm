@@ -17,6 +17,13 @@ use constant UPDIR_STR => '..';
 use constant CURDIR_STR => '.';
 use constant DIRSEP_STR => '/';
 
+has param 'readonly' => (
+	isa => Bool,
+	writer => 1,
+	lazy => 1,
+	clearer => -hidden,
+);
+
 # HELPERS
 
 # this is intentionally not portable - only drivers working on an actual
@@ -129,6 +136,11 @@ sub common_properties
 	};
 }
 
+sub refresh
+{
+	# Nothing to clear here
+}
+
 # TO BE IMPLEMENTED IN SUBCLASSES
 
 sub store_impl
@@ -171,13 +183,7 @@ sub list_impl
 sub store
 {
 	my ($self, $name, $handle) = @_;
-
-	if (ref $handle ne 'GLOB') {
-		Storage::Abstract::X::HandleError->raise('handle argument is not defined')
-			unless defined $handle;
-
-		$handle = $self->open_handle($handle);
-	}
+	local $Storage::Abstract::X::path_context = $name;
 
 	Storage::Abstract::X::Readonly->raise('storage is readonly')
 		if $self->readonly;
@@ -189,6 +195,7 @@ sub store
 sub is_stored
 {
 	my ($self, $name) = @_;
+	local $Storage::Abstract::X::path_context = $name;
 
 	return $self->is_stored_impl($self->resolve_path($name));
 }
@@ -196,27 +203,20 @@ sub is_stored
 sub retrieve
 {
 	my ($self, $name, $properties) = @_;
-	my $path = $self->resolve_path($name);
+	local $Storage::Abstract::X::path_context = $name;
 
-	Storage::Abstract::X::NotFound->raise("file $name was not found")
-		unless $self->is_stored_impl($path);
-
-	return $self->retrieve_impl($path, $properties);
+	return $self->retrieve_impl($self->resolve_path($name), $properties);
 }
 
 sub dispose
 {
 	my ($self, $name) = @_;
+	local $Storage::Abstract::X::path_context = $name;
 
 	Storage::Abstract::X::Readonly->raise('storage is readonly')
 		if $self->readonly;
 
-	my $path = $self->resolve_path($name);
-
-	Storage::Abstract::X::NotFound->raise("file $name was not found")
-		unless $self->is_stored_impl($path);
-
-	$self->dispose_impl($path);
+	$self->dispose_impl($self->resolve_path($name));
 	return;
 }
 
