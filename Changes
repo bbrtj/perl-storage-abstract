@@ -4,6 +4,7 @@ Revision history for Storage-Abstract
 	- Added 'refresh' method to Storage::Abstract and its drivers
 	- Defined 'public_url' extension key in retrieve properties
 	- Internal refactoring of drivers and driver roles
+	- Metadrivers performance improvements
 
 0.006 - 2024-10-19
 	- Added superpath driver
