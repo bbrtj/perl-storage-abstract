@@ -9,6 +9,7 @@ use Types::Common -types;
 use namespace::autoclean;
 
 use Scalar::Util qw(blessed);
+use Storage::Abstract::Handle;
 use Storage::Abstract::X;
 
 # Not using File::Spec here, because paths must be unix-like regardless of
@@ -63,75 +64,12 @@ sub resolve_path
 	return join DIRSEP_STR, @path;
 }
 
-sub open_handle
-{
-	my ($self, $arg) = @_;
-	return $arg
-		if blessed $arg && $arg->isa('IO::Handle');
-
-	open my $fh, '<:raw', $arg
-		or Storage::Abstract::X::HandleError->raise((ref $arg ? '' : "$arg: ") . $!);
-
-	return $fh;
-}
-
-sub copy_handle
-{
-	my ($self, $handle_from, $handle_to) = @_;
-
-	# no extra behavior of print
-	local $\;
-
-	my $read = sub { read $_[0], $_[1], 8 * 1024 };
-	my $write = sub { print {$_[0]} $_[1] };
-
-	# can use sysread / syswrite?
-	if (fileno $handle_from != -1 && fileno $handle_to != -1) {
-		$read = sub { sysread $_[0], $_[1], 128 * 1024 };
-		$write = sub {
-			my $written = 0;
-			while ($written < $_[2]) {
-				my $res = syswrite $_[0], $_[1], $_[2], $written;
-				return undef unless defined $res;
-				$written += $res;
-			}
-
-			return 1;
-		};
-	}
-
-	my $buffer;
-	while ('copying') {
-		my $bytes = $read->($handle_from, $buffer);
-
-		Storage::Abstract::X::HandleError->raise("error reading from handle: $!")
-			unless defined $bytes;
-		last if $bytes == 0;
-		$write->($handle_to, $buffer, $bytes)
-			or Storage::Abstract::X::StorageError->raise("error during file copying: $!");
-	}
-}
-
 sub common_properties
 {
 	my ($self, $handle) = @_;
-	my $size = do {
-		if (fileno $handle == -1) {
-			my $success = (my $pos = tell $handle) >= 0;
-			$success &&= seek $handle, 0, 2;
-			$success &&= (my $res = tell $handle) >= 0;
-			$success &&= seek $handle, $pos, 0;
-
-			$success or Storage::Abstract::X::HandleError->raise($!);
-			$res;
-		}
-		else {
-			-s $handle;
-		}
-	};
 
 	return {
-		size => $size,
+		size => tied(*$handle)->size,
 		mtime => time,
 	};
 }
@@ -294,22 +232,6 @@ guaranteed to be called automatically every time one of the delegated methods
 is called, before the path is used for anything. As such, it can be
 reimplemented in a driver class to modify its behavior (see
 L<Storage::Abstract::Driver::Directory> for an example).
-
-=head3 open_handle
-
-	$fh = $obj->open_handle(\$content);
-	$fh = $obj->open_handle($filename);
-
-This tries to create a readonly, binary handle from its argument. It will not
-do anything if the argument is a class of L<IO::Handle>.
-
-=head3 copy_handle
-
-	$obj->copy_handle($fh_from, $fh_to)
-
-This copies the data from C<$fh_from> to C<$fh_to>. Based on the C<fileno>
-result on the handles, it uses either C<sysread> + C<syswrite> or C<read> +
-C<print>. Use this to move data between filehandles in driver classes.
 
 =head3 common_properties
 

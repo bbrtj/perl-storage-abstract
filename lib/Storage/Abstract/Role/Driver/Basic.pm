@@ -7,18 +7,15 @@ use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
 use Moo::Role;
 
+use Storage::Abstract::Handle;
+
 sub _build_readonly
 {
 	return !!0;
 }
 
 before 'store_impl' => sub {
-	if (ref $_[2] ne 'GLOB') {
-		Storage::Abstract::X::HandleError->raise('handle argument is not defined')
-			unless defined $_[2];
-
-		$_[2] = $_[0]->open_handle($_[2]);
-	}
+	$_[2] = Storage::Abstract::Handle->adapt($_[2]);
 };
 
 before ['retrieve_impl', 'dispose_impl'] => sub {

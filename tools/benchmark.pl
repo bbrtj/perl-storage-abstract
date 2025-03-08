@@ -38,7 +38,7 @@ cmpthese - 3, {
 	},
 	read => sub {
 		my $handle = $storage->retrieve('/test/abc');
-		while (my $line = readline $handle) {}
+		while (my $line = readline $handle) { }
 	},
 };
 

@@ -27,7 +27,7 @@ sub store_impl
 	open my $fh, '>:raw', \$files->{$name}{content}
 		or Storage::Abstract::X::StorageError->raise("Could not open storage: $!");
 
-	$self->copy_handle($handle, $fh);
+	tied(*$handle)->copy($fh);
 
 	close $fh
 		or Storage::Abstract::X::StorageError->raise("Could not close handle: $!");
@@ -49,7 +49,7 @@ sub retrieve_impl
 		%{$properties} = %{$files->{$name}{properties}};
 	}
 
-	return $self->open_handle(\$files->{$name}{content});
+	return Storage::Abstract::Handle->adapt(\$files->{$name}{content});
 }
 
 sub dispose_impl

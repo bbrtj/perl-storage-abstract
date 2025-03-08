@@ -89,7 +89,7 @@ sub store_impl
 	open my $fh, '>:raw', $name
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
 
-	$self->copy_handle($handle, $fh);
+	tied(*$handle)->copy($fh);
 
 	close $fh
 		or Storage::Abstract::X::StorageError->raise("$name: $!");
@@ -114,7 +114,7 @@ sub retrieve_impl
 		);
 	}
 
-	return $self->open_handle($name);
+	return Storage::Abstract::Handle->adapt($name);
 }
 
 sub dispose_impl
