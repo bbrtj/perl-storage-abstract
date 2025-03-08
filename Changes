@@ -1,6 +1,8 @@
 Revision history for Storage-Abstract
 
 {{$NEXT}}
+
+0.007 - 2025-03-08
 	- Added 'refresh' method to Storage::Abstract and its drivers
 	- Defined 'public_url' extension key in retrieve properties
 	- Internal refactoring of drivers and driver roles
