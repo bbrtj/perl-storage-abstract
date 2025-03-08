@@ -72,7 +72,7 @@ sub adapt
 {
 	my ($class, $arg) = @_;
 
-	return $arg if Scalar::Util::blessed $arg && $arg->isa($class);
+	return $arg if defined tied($arg) && tied($arg)->isa($class);
 
 	my $fh = \do { local *HANDLE };
 	tie *$fh, $class, $arg;
@@ -160,4 +160,80 @@ sub CLOSE
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Storage::Abstract::Handle - Tied filehandle for stored files
+
+=head1 SYNOPSIS
+
+	# in driver's code
+	Storage::Abstract::Handle->adapt($handle_ref);
+
+	# or
+	Storage::Abstract::Handle->adapt($file_name);
+
+	# or
+	Storage::Abstract::Handle->adapt(\$file_content);
+
+=head1 DESCRIPTION
+
+This is a class for returning tied file handles to a storage file. Tied handles
+allows fetching the content lazily when the read call occurs. Handles created
+with this class are always readonly.
+
+This class also contain a couple helpers for reading from user-supplied handles
+during adding files to storage.
+
+=head1 INTERFACE
+
+=head2 Attributes
+
+=head3 handle
+
+The actual underlying handle reference. All tie methods in this class by
+default are just proxies to same operations on this handle.
+
+=head2 Helper methods
+
+=head3 adapt
+
+	$tied_object = $class->adapt($tied_object)
+	$tied_object = $class->adapt($handle_ref)
+	$tied_object = $class->adapt($file_name)
+	$tied_object = $class->adapt(\$file_content)
+
+This static methods tries to adapt its argument to be a proper tied object.
+Does nothing if the argument is a proper tied object already. Otherwise it must
+be a file handle or something which can be opened using C<open> (usually a file
+name or a scalar reference).
+
+=head3 size
+
+	$size = tied($tied_object)->size
+
+Returns the size of the underlying resource, in bytes.
+
+=head3 copy
+
+	tied($tied_object)->copy($handle_to)
+
+Copies the underlying resource to C<$handle_to>, which must be open for writing
+in raw bytes mode. For efficiency, may use C<sysread>/C<syswrite> if both
+handles point to regular files, bypassing perl IO layers.
+
+=head1 SUBCLASSING
+
+This class is meant to be subclassed by drivers which read remote resources and
+can't simply open and return a handle. Subclassed versions of this class can
+track the position in file based on C<READ>, C<READFILE> and C<SEEK> calls, and
+fetch required data lazily. Or simply download the file in full once a read has
+been requested the first time.
+
+Core Storage::Abstract does not contain any drivers which may fetch remote
+resources, so details of the implementation are up to the driver developers.
+The only requirement is that no costly data fetch operations are performed
+before the handle is first read.
 

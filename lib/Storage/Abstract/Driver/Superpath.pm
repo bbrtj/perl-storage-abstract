@@ -101,7 +101,7 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Superpath - Mount under directory metadriver
+Storage::Abstract::Driver::Superpath - Mount under directory meta driver
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ Storage::Abstract::Driver::Superpath - Mount under directory metadriver
 
 =head1 DESCRIPTION
 
-This metadriver does the opposite of L<Storage::Abstract::Driver::Subpath> - it
+This meta driver does the opposite of L<Storage::Abstract::Driver::Subpath> - it
 mounts its source driver under a passed L</superpath> directory. It will work
 as if the entire filesystem was moved to that directory. Any file path must
 have L</superpath> prepended to it explicitly in order to successfully target a
@@ -153,6 +153,6 @@ though the storage may not report being readonly). For this reason, it works
 best when underlying storage is marked as C<readonly>.
 
 This driver caches the readonly state of its subdriver to make its behavior
-consistent with other metadrivers. You can call C<refresh> to make it
+consistent with other meta drivers. You can call C<refresh> to make it
 recalculate the readonly state.
 

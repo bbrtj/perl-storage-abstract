@@ -181,14 +181,15 @@ Storage::Abstract::Driver - Base class for drivers
 	extends 'Storage::Abstract::Driver';
 
 	# consume one of those roles
-	with 'Storage::Abstract::Role::Driver';
-	with 'Storage::Abstract::Role::Metadriver';
+	with 'Storage::Abstract::Role::Driver::Basic';
+	with 'Storage::Abstract::Role::Driver::Meta';
 
 	# these methods need implementing
 	sub store_impl { ... }
 	sub is_stored_impl { ... }
 	sub retrieve_impl { ... }
 	sub dispose_impl { ... }
+	sub list_impl { ... }
 
 =head1 DESCRIPTION
 
@@ -198,8 +199,8 @@ methods which must be implemented in the subclasses, and a couple of helpers
 which may be used or reimplemented in the subclasses when needed.
 
 This class should never be instantiated directly. Its subclasses should consume
-one of the roles, either L<Storage::Abstract::Role::Driver> or
-L<Storage::Abstract::Role::Metadriver>.
+one of the roles, either L<Storage::Abstract::Role::Driver::Basic> or
+L<Storage::Abstract::Role::Driver::Meta>.
 
 =head1 INTERFACE
 
@@ -212,12 +213,13 @@ These attributes are common to all drivers.
 Boolean - whether this driver is readonly. False by default. May be changed
 using C<set_readonly>.
 
-This attribute is not applicable to metadrivers. This type of drivers don't
-store its own readonly status, but instead reports the status of its source via
-C<readonly>. Calling C<set_readonly> on metadrivers will call C<set_readonly>
-of the underlying driver. If the metadriver holds more than one source (for
-example L<Storage::Abstract::Driver::Composite>), calling C<set_readonly> will
-throw an exception.
+This attribute is not applicable to meta drivers. This type of drivers don't
+store its own readonly status, so this attribute is used as a cache for the
+underlying drivers C<readonly> status. Calling C<set_readonly> on meta drivers
+will call C<set_readonly> of the underlying driver and refresh the cache. If
+the meta driver holds more than one source (for example
+L<Storage::Abstract::Driver::Composite>), calling C<set_readonly> will throw an
+exception.
 
 =head2 Helper methods
 
@@ -253,7 +255,11 @@ These methods must be reimplemented in driver classes:
 	store_impl($path, $fh)
 
 The implementation of storing a new file in the storage. It will be passed a
-normalized path and an opened file handle. Its return value will be ignored.
+normalized path and an open file handle. For drivers implementing
+L<Storage::Abstract::Role::Driver::Basic>, C<$fh> will be a tied object of
+L<Storage::Abstract::Handle>.
+
+Its return value will be ignored.
 
 =item * C<is_stored_impl>
 
@@ -273,13 +279,14 @@ fetch properties when the second argument is undefined (if such optimization is
 possible). Every driver should include at least the same keys as returned by
 L</common_properties>.
 
-It should not check C<is_stored> - it will never be called without checking
+Basic drivers should not check C<is_stored> - it will never be called without checking
 C<is_stored> first. Must return an open file handle to the file. The file
 handle should be rewound to the beginning (ready to be read without calling
 C<seek>) and it should read data into memory lazily regardless of the
-underlying storage type. Calling C<retrieve_impl> by itself should not cause
-the storage to perform any IO operations, so that it can be used just to fetch
-C<%properties> efficiently.
+underlying storage type. It is recommended that the file handle is a tied
+object of L<Storage::Abstract::Handle> or its subclass. Calling
+C<retrieve_impl> by itself should not cause the storage to perform any IO
+operations, so that it can be used just to fetch C<%properties> efficiently.
 
 =item * C<dispose_impl>
 
@@ -287,7 +294,7 @@ C<%properties> efficiently.
 
 The implementation of disposing a file. First argument is a normalized path.
 
-It should not check C<is_stored> - it will never be called without checking
+Basic drivers should not check C<is_stored> - it will never be called without checking
 C<is_stored> first. Its return value will be ignored.
 
 =item * C<list_impl>

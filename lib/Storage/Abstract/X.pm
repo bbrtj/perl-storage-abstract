@@ -140,6 +140,10 @@ This exception is raised when a problem occurs with the underlying file storage.
 
 =head2 Attributes
 
+=head3 path
+
+This is a path to a file which was being operated on when the problem occured.
+
 =head3 message
 
 B<Required> - Human-readable description of the problem.

@@ -5,9 +5,8 @@ use warnings;
 
 use Mooish::AttributeBuilder -standard;
 use Types::Common -types;
-use Moo::Role;
-
 use List::Util qw(all);
+use Moo::Role;
 
 requires qw(
 	source_is_array

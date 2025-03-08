@@ -146,7 +146,7 @@ extra attributes that driver need. All implementation details depend on the
 chosen driver, this module only contains methods which delegate to same methods
 of the driver.
 
-There are drivers and metadrivers. Metadrivers do not implement any file
+There are basic drivers and meta drivers. Meta drivers do not implement any file
 storage by themselves, but rather change the way other storages work. The module
 comes with the following driver implementations:
 
@@ -154,31 +154,31 @@ comes with the following driver implementations:
 
 =item * L<Storage::Abstract::Driver::Memory>
 
-This driver keeps the files in Perl process memory as strings.
+This basic driver keeps the files in Perl process memory as strings.
 
 =item * L<Storage::Abstract::Driver::Directory>
 
-This driver stores the files in a local machine's directory.
+This basic driver stores the files in a local machine's directory.
 
 =item * L<Storage::Abstract::Driver::Composite>
 
-This metadriver can be configured to keep a couple source storages at once and
+This meta driver can be configured to keep a couple source storages at once and
 use them all in sequence until it finds a file.
 
 =item * L<Storage::Abstract::Driver::Subpath>
 
-This metadriver is useful when you want to modify the base path of
+This meta driver is useful when you want to modify the base path of
 another storage, to restrict access or adapt a path (for example for HTTP
 public directory).
 
 =item * L<Storage::Abstract::Driver::Superpath>
 
-This metadriver does the opposite of C<subpath> - allows you to modify path of
+This meta driver does the opposite of C<subpath> - allows you to modify path of
 a storage to virtually put it into a nested directory as a whole.
 
 =item * L<Storage::Abstract::Driver::Null>
 
-This driver does nothing - it won't store or retrieve anything.
+This basic driver does nothing - it won't store or retrieve anything.
 
 =back
 
@@ -221,10 +221,10 @@ C<a/..> will raise C<Storage::Abstract::X::PathError>.
 
 =head2 File handles
 
-This module works with open filehandles in binary mode. These handles are
-likely to be pointing at an in-memory scalar rather than a regular file, so they
-are not guaranteed to work with C<sysread>/C<syswrite>. You may use C<fileno>
-to check if a handle is pointing to an actual file.
+This module returns references to tied filehandles, which allow fetching the
+data lazily in the background when they are read. These handles are open in raw
+binary mode. Since they are tied, they will not point to a regular file, so
+they will not work as expected with C<sysread>/C<syswrite>.
 
 If you pass a handle to L</store>, it should be properly marked as binary with
 C<binmode> and should be rewinded to a point from which you want to store it
@@ -375,7 +375,7 @@ exception on L</store> and L</dispose>.
 
 Sets the readonly status of the storage to a new value.
 
-This method does not work and throws an exception for metadrivers using
+This method does not work and throws an exception for meta drivers using
 multiple sources of storage, like L<Storage::Abstract::Driver::Composite>.
 
 =head3 refresh

@@ -177,7 +177,7 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Composite - Aggregate metadriver
+Storage::Abstract::Driver::Composite - Aggregate meta driver
 
 =head1 SYNOPSIS
 
@@ -197,7 +197,7 @@ Storage::Abstract::Driver::Composite - Aggregate metadriver
 
 =head1 DESCRIPTION
 
-This metadriver can hold a number of drivers under itself (in sequence) and
+This meta driver can hold a number of drivers under itself (in sequence) and
 choose the first driver which holds a given file.
 
 =head2 Choosing the source

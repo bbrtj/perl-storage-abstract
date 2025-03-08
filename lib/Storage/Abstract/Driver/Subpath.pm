@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-Storage::Abstract::Driver::Subpath - Change root metadriver
+Storage::Abstract::Driver::Subpath - Change root meta driver
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ Storage::Abstract::Driver::Subpath - Change root metadriver
 
 =head1 DESCRIPTION
 
-This metadriver can modify another driver to use a different path than root. It
+This meta driver can modify another driver to use a different path than root. It
 will work as if the root of the L</source> driver was changed to L</subpath>.
 It does the opposite of L<Storage::Abstract::Driver::Superpath>.
 
@@ -131,6 +131,6 @@ B<Required> - A path prefix for all paths passed to the L</source> driver.
 =head1 CAVEATS
 
 This driver caches the readonly state of its subdriver to make its behavior
-consistent with other metadrivers. You can call C<refresh> to make it
+consistent with other meta drivers. You can call C<refresh> to make it
 recalculate the readonly state.
 
