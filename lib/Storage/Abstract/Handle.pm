@@ -3,6 +3,10 @@ package Storage::Abstract::Handle;
 use v5.14;
 use warnings;
 
+# 5.14 does not allow bypassing CORE function prototype, so we have a bunch of
+# uninitialized warnings which need to be silenced.
+no warnings 'uninitialized';
+
 use Carp qw();
 use Scalar::Util qw();
 use Storage::Abstract::X;
@@ -121,7 +125,7 @@ sub BINMODE
 {
 	my $self = shift;
 
-	return &CORE::binmode($self->{handle}, @_);
+	return binmode $self->{handle}, $_[0];
 }
 
 sub TELL
@@ -135,7 +139,7 @@ sub SEEK
 {
 	my $self = shift;
 
-	return &CORE::seek($self->{handle}, @_);
+	return seek $self->{handle}, $_[0], $_[1];
 }
 
 sub READLINE
@@ -149,7 +153,7 @@ sub READ
 {
 	my $self = shift;
 
-	return &CORE::read($self->{handle}, \$_[0], @_[1 .. $#_]);
+	return read $self->{handle}, $_[0], $_[1], $_[2];
 }
 
 sub CLOSE
