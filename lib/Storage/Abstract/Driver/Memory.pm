@@ -3,10 +3,7 @@ package Storage::Abstract::Driver::Memory;
 use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
-use namespace::autoclean;
+use Mooish::Base -standard;
 
 extends 'Storage::Abstract::Driver';
 

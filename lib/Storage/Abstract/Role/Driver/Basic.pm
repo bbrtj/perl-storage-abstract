@@ -3,9 +3,7 @@ package Storage::Abstract::Role::Driver::Basic;
 use v5.14;
 use warnings;
 
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
-use Moo::Role;
+use Mooish::Base -standard, -role;
 
 use Storage::Abstract::Handle;
 

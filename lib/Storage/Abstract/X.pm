@@ -3,10 +3,7 @@ package Storage::Abstract::X;
 use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
-use namespace::autoclean;
+use Mooish::Base -standard;
 
 use overload
 	q{""} => "as_string",

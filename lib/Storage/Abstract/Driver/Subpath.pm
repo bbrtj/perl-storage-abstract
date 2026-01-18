@@ -3,10 +3,7 @@ package Storage::Abstract::Driver::Subpath;
 use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
-use namespace::autoclean;
+use Mooish::Base -standard;
 
 # need this in BEGIN block because we use constants from this package
 BEGIN { extends 'Storage::Abstract::Driver' }
