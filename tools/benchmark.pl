@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Benchmark qw(cmpthese);
+use Benchmark::Dumb qw(cmpthese);
 
 use lib 'lib';
 
@@ -29,7 +29,7 @@ $storage->store('/test/abc', \"abcdef\nghijkl");
 $storage->driver->source->[0]->driver->source->set_readonly(!!1);
 $storage->refresh;
 
-cmpthese - 3, {
+cmpthese 200.01, {
 	store => sub {
 		$storage->store('/test2/abc', \'abcdef');
 	},
