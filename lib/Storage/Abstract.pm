@@ -216,6 +216,36 @@ C<a/..> will raise C<Storage::Abstract::X::PathError>.
 
 =back
 
+=head2 Handling of directories
+
+This module's goal is to offer simple interface over file access, not
+reimplement a whole function of a filesystem. For this reason, directory access
+is not a primary focus and is only implemented in a way that allows most
+important directory functions without increasing driver implementation
+difficulty significantly.
+
+The following actions on directories are supported:
+
+=over
+
+=item * Listing contents of a directory
+
+You can L</list> all files and directories under a specific directory. Either files
+or directories are listed, which is controlled by C<directories> flag.
+
+=item * Checking existence of a directory
+
+This is done with L</is_stored> method with C<directory> flag.
+
+=item * Disposing an empty directory
+
+This is done with L</dispose> method with C<directory> flag.
+
+=back
+
+Creating new empty directories is unsupported, since they are spawned
+automatically when a file is stored in them.
+
 =head2 File handles
 
 This module returns references to tied filehandles, which allow fetching the
@@ -294,16 +324,16 @@ These are common methods not dependant on a driver.
 
 =head3 new
 
-	$obj = Storage::Abstract->new(%args);
-	$obj = Storage::Abstract->new(\%args);
+	$obj = Storage::Abstract->new(%args)
+	$obj = Storage::Abstract->new(\%args)
 
 Moose-flavoured constructor, but C<%args> will be used to construct the driver
 rather than this class.
 
 =head3 load_driver
 
-	$driver_obj = Storage::Abstract->load_driver(%args);
-	$driver_obj = Storage::Abstract->load_driver(\%args);
+	$driver_obj = Storage::Abstract->load_driver(%args)
+	$driver_obj = Storage::Abstract->load_driver(\%args)
 
 Loads the driver package and constructs the driver using C<%args> (same as in
 the constructor). Returns an instance of L<Storage::Abstract::Driver>.
@@ -323,13 +353,30 @@ C<undef>.
 	$obj->store($path, $filename)
 	$obj->store($path, $handle)
 
-Stores a new file in the storage under C<$path>. Does not return anything.
+Stores a new file in the storage under C<$path>. Does not return
+anything. Error is reported by throwing an exception.
 
 =head3 is_stored
 
-	$bool = $obj->is_stored($path)
+	$bool = $obj->is_stored($path, %opts)
 
-Checks whether a given C<$path> is stored in the storage. Returns true if it is.
+Checks whether a given C<$path> is stored in the storage as a file.
+Returns true if it is.
+
+C<%opts> can be any of:
+
+=over
+
+=item * C<directory>
+
+When true, changes the function of the method to work no directories instead of
+files - allowing checking if a directory exists.
+
+=back
+
+Storing files and directories under the same name is disallowed, so to be sure
+whether a name is available for saving a file, this method must be called twice
+- with and without C<directory> flag.
 
 =head3 retrieve
 
@@ -343,21 +390,60 @@ be filled with additional properties of the file, such as C<mtime>
 
 =head3 dispose
 
-	$obj->dispose($path)
+	$obj->dispose($path, %opts)
 
 Removes file C<$path> from the storage.
 
 It treats missing files as an error, so if no exception occurs you can be sure
 that the removal was performed.
 
+C<%opts> can be any of:
+
+=over
+
+=item * C<directory>
+
+When true, changes the function of the method to work no directories instead of
+files - allowing disposing (empty) directories.
+
+=back
+
 =head3 list
 
-	my $filenames_aref = $obj->list;
+	$filenames_aref = $obj->list($path = '/', %opts)
 
-Lists the names of all files existing in the storage in an array reference.
-These names will be forced to the normalized form.
+Lists the names of files existing in the storage in an array reference. These
+names will be forced to the normalized form.
 
-This may be a costly operation (depending on the driver), so use it sparingly.
+C<$path> can be passed as a path to a directory. Only files under that
+directory will be listed. By default, the root path is used.
+
+By default, all files (but not directories) which are located directly under
+C<$path> are listed. This behavior can be modified with C<%opts>:
+
+=over
+
+=item * C<directories>
+
+When true, causes the method call to return directories instead of files.
+
+=item * C<recursive>
+
+When true, causes the method call to return all elements recursively, rather
+than stopping on the first level.
+
+=item * C<filter>
+
+Grep-like filter for resulting filenames. The default filter is C<*>, which is
+a no-op. It can be passed as a string to modify the filter, for example
+C<*.txt> will only return files ending with C<.txt>.
+
+C<*> is the only special character in the filter, and it matches any number of
+characters, including C<0>. It is matched against last part of the path (the
+basename). The filter must match the path from start to end for the file to be
+included.
+
+=back
 
 =head3 readonly
 

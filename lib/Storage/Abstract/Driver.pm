@@ -28,11 +28,11 @@ has param 'readonly' => (
 # filesystem should port this unix-like path to its own representation
 sub resolve_path
 {
-	my ($self, $name) = @_;
+	my ($self, $name, %opts) = @_;
 
-	my @path = split DIRSEP_STR, $name, -1;
+	my @path = $self->split_path($name);
 	Storage::Abstract::X::PathError->raise("path $name is empty")
-		if !@path;
+		unless @path || $opts{allow_empty};
 
 	my $i = 0;
 	my $last_ok = 1;
@@ -56,9 +56,21 @@ sub resolve_path
 	}
 
 	Storage::Abstract::X::PathError->raise("path $name has no filename")
-		unless $last_ok;
+		unless $last_ok || $opts{allow_directory};
 
-	return join DIRSEP_STR, @path;
+	return $self->join_path(@path);
+}
+
+sub split_path
+{
+	my ($self, $name) = @_;
+	return split DIRSEP_STR, $name, -1;
+}
+
+sub join_path
+{
+	my ($self, @parts) = @_;
+	return join DIRSEP_STR, @parts;
 }
 
 sub common_properties
@@ -87,7 +99,7 @@ sub store_impl
 
 sub is_stored_impl
 {
-	my ($self, $name) = @_;
+	my ($self, $name, %opts) = @_;
 
 	...;
 }
@@ -101,12 +113,19 @@ sub retrieve_impl
 
 sub dispose_impl
 {
-	my ($self, $name, $handle) = @_;
+	my ($self, $name, %opts) = @_;
 
 	...;
 }
 
 sub list_impl
+{
+	my ($self, $directory, %opts) = @_;
+
+	...;
+}
+
+sub prune_impl
 {
 	my ($self) = @_;
 
@@ -129,10 +148,10 @@ sub store
 
 sub is_stored
 {
-	my ($self, $name) = @_;
+	my ($self, $name, %opts) = @_;
 	local $Storage::Abstract::X::path_context = $name;
 
-	return $self->is_stored_impl($self->resolve_path($name));
+	return $self->is_stored_impl($self->resolve_path($name, allow_directory => $opts{directory}), %opts);
 }
 
 sub retrieve
@@ -145,21 +164,42 @@ sub retrieve
 
 sub dispose
 {
-	my ($self, $name) = @_;
+	my ($self, $name, %opts) = @_;
 	local $Storage::Abstract::X::path_context = $name;
 
 	Storage::Abstract::X::Readonly->raise('storage is readonly')
 		if $self->readonly;
 
-	$self->dispose_impl($self->resolve_path($name));
+	$self->dispose_impl($self->resolve_path($name, allow_directory => $opts{directory}), %opts);
 	return;
 }
 
 sub list
 {
+	my ($self, $directory, %opts) = @_;
+	local $Storage::Abstract::X::path_context = $directory;
+
+	$directory = $self->resolve_path(
+		$directory // '',
+		allow_directory => !!1,
+		allow_empty => !!1,
+	);
+	$opts{recursive} //= !!0;
+	$opts{filter} //= '*';
+	$opts{directories} //= !!0;
+
+	return $self->list_impl($directory, %opts);
+}
+
+sub prune
+{
 	my ($self) = @_;
 
-	return $self->list_impl;
+	Storage::Abstract::X::Readonly->raise('storage is readonly')
+		if $self->readonly;
+
+	$self->prune_impl();
+	return;
 }
 
 1;
@@ -260,10 +300,22 @@ Its return value will be ignored.
 
 =item * C<is_stored_impl>
 
-	is_stored_impl($path)
+	is_stored_impl($path, %opts)
 
 The implementation of checking whether a file is stored. It will be passed a
 normalized path. Must return a boolean.
+
+The following C<%opts> should be supported:
+
+=over
+
+=item * directory
+
+Boolean - whether to allow checking existence of directories instead of files.
+Without this flag, method should return false value if element exists as a
+directory.
+
+=back
 
 =item * C<retrieve_impl>
 
@@ -287,19 +339,51 @@ operations, so that it can be used just to fetch C<%properties> efficiently.
 
 =item * C<dispose_impl>
 
-	dispose_impl($path)
+	dispose_impl($path, %opts)
 
 The implementation of disposing a file. First argument is a normalized path.
 
 Basic drivers should not check C<is_stored> - it will never be called without checking
 C<is_stored> first. Its return value will be ignored.
 
+The following C<%opts> should be supported:
+
+=over
+
+=item * directory
+
+Boolean - whether to allow removing (empty) directories, instead of removing files.
+
+=back
+
 =item * C<list_impl>
 
-	list_impl($path)
+	list_impl($path, %opts)
 
 The implementation of getting a list of files. Should return an array reference
-with file names (in Unix format).
+with file names under directory C<$path> (in Unix format).
+
+If C<$path> is undefined, root path should be used.
+
+The following C<%opts> should be supported:
+
+=over
+
+=item * directories
+
+Boolean - whether to search for directories instead of files.
+
+=item * recursive
+
+Boolean - whether the search under C<$path> should be recursive (find in subdirectories)
+
+=item * filter
+
+String - a filter for plain filenames (excluding directory name). This will
+likely contain a wildcard C<*> to allow grep-like filtering. For example
+C<*.pm> will only match for Perl modules.
+
+=back
 
 =back
 

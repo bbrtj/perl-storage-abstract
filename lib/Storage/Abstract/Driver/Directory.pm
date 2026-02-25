@@ -43,24 +43,29 @@ sub BUILD
 		unless -d $directory;
 }
 
-sub get_list
+sub _list
 {
-	my ($self, $dir) = @_;
+	my ($self, $dir, %opts) = @_;
 	my @files = File::Spec->no_upwards(glob File::Spec->catfile($dir, '*'));
-	my @directories = grep { -d } @files;
-	@files = (
-		(grep { !-d } @files),
-		(map { $self->get_list($_) } @directories),
-	);
 
-	return @files;
+	my @directories = grep { -d } @files;
+
+	my @results = grep { /$opts{filter_re}/ } $opts{directories}
+		? @directories
+		: grep { !-d } @files
+		;
+
+	push @results, map { $self->_list($_, %opts) } @directories
+		if $opts{recursive};
+
+	return @results;
 }
 
 sub resolve_path
 {
-	my ($self, $name) = @_;
+	my ($self, $name, %opts) = @_;
 
-	my $resolved = $self->SUPER::resolve_path($name);
+	my $resolved = $self->SUPER::resolve_path($name, %opts);
 	if (Storage::Abstract::Driver::DIRSEP_STR ne DIRSEP_STR) {
 		Storage::Abstract::X::PathError->raise("System-specific dirsep in file path $name")
 			if $resolved =~ quotemeta DIRSEP_STR;
@@ -84,19 +89,24 @@ sub store_impl
 	make_path($directory) unless -e $directory;
 
 	open my $fh, '>:raw', $name
-		or Storage::Abstract::X::StorageError->raise("$name: $!");
+		or Storage::Abstract::X::StorageError->raise($!);
 
 	tied(*$handle)->copy($fh);
 
 	close $fh
-		or Storage::Abstract::X::StorageError->raise("$name: $!");
+		or Storage::Abstract::X::StorageError->raise($!);
 }
 
 sub is_stored_impl
 {
-	my ($self, $name) = @_;
+	my ($self, $name, %opts) = @_;
 
-	return -f $name;
+	if ($opts{directory}) {
+		return -d $name;
+	}
+	else {
+		return -f $name;
+	}
 }
 
 sub retrieve_impl
@@ -116,22 +126,42 @@ sub retrieve_impl
 
 sub dispose_impl
 {
-	my ($self, $name) = @_;
+	my ($self, $name, %opts) = @_;
 
-	unlink $name
-		or Storage::Abstract::X::StorageError->raise("$name: $!");
+	if ($opts{directory}) {
+		rmdir $name
+			or Storage::Abstract::X::StorageError->raise($!);
+	}
+	else {
+		unlink $name
+			or Storage::Abstract::X::StorageError->raise($!);
+	}
 }
 
 sub list_impl
 {
-	my ($self) = @_;
+	my ($self, $directory, %opts) = @_;
+
+	Storage::Abstract::X::NotFound->raise(
+		'directory does not exist'
+	) unless -e $directory;
+
+	Storage::Abstract::X::StorageError->raise(
+		'object type mismatch - not a directory'
+	) unless -d $directory;
+
+	my $dirsep = $self->DIRSEP_STR;
+	$opts{filter_re} = quotemeta $opts{filter};
+	$opts{filter_re} =~ s{\\\*}{[^$dirsep]*}g;
+	$opts{filter_re} = qr{(?<=\Q$dirsep\E) $opts{filter_re} $}x;
+
+	my @all_files = $self->_list($directory, %opts);
 
 	my $basedir = $self->directory;
-	my @all_files = $self->get_list($basedir);
 	foreach my $file (@all_files) {
 		$file = File::Spec->abs2rel($file, $basedir);
 		my @parts = File::Spec->splitdir($file);
-		$file = $self->SUPER::resolve_path(join Storage::Abstract::Driver::DIRSEP_STR, @parts);
+		$file = $self->SUPER::resolve_path($self->join_path(@parts));
 	}
 
 	return \@all_files;
