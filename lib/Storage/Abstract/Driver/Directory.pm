@@ -150,10 +150,10 @@ sub list_impl
 		'object type mismatch - not a directory'
 	) unless -d $directory;
 
-	my $dirsep = $self->DIRSEP_STR;
+	my $dirsep = quotemeta $self->DIRSEP_STR;
 	$opts{filter_re} = quotemeta $opts{filter};
 	$opts{filter_re} =~ s{\\\*}{[^$dirsep]*}g;
-	$opts{filter_re} = qr{(?<=\Q$dirsep\E) $opts{filter_re} $}x;
+	$opts{filter_re} = qr{(?<=$dirsep) $opts{filter_re} $}x;
 
 	my @all_files = $self->_list($directory, %opts);
 
