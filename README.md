@@ -1,5 +1,6 @@
 # Storage::Abstract
-A Perl module for storing files in different locations.
+A Perl module offering unified interface for file storage independent of
+storage backend.
 
 ## Code and documentation
 [Storage::Abstract on CPAN](https://metacpan.org/release/Storage-Abstract)
