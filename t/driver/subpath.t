@@ -18,28 +18,29 @@ my $storage = Storage::Abstract->new(
 	source => $nested_storage,
 );
 
-$nested_storage->store('foo', \'foo');
-$nested_storage->store('foo/bar', \'bar');
-$nested_storage->store('foo/bar/baz', \'baz');
+$nested_storage->store('foo1', \'foo');
+$nested_storage->store('foo/bar1', \'bar');
+$nested_storage->store('foo/bar/baz1', \'baz');
 
-ok $storage->is_stored('bar/baz'), 'baz stored ok';
-is slurp_handle($storage->retrieve('bar/baz', \my %info)), 'baz', 'baz content ok';
+ok $storage->is_stored('bar', directory => !!1), 'directory stored ok';
+ok $storage->is_stored('bar/baz1'), 'baz stored ok';
+is slurp_handle($storage->retrieve('bar/baz1', \my %info)), 'baz', 'baz content ok';
 is $info{mtime}, within(time, 3), 'mtime ok';
 is $info{size}, 3, 'size ok';
 
-$storage->store('foo', \'foo2');
-ok $nested_storage->is_stored('foo/foo'), 'nested foo stored ok';
+$storage->store('foo1', \'foo2');
+ok $nested_storage->is_stored('foo/foo1'), 'nested foo stored ok';
 
-is $storage->list, bag {
-	item 'foo';
-	item 'bar';
-	item 'bar/baz';
+is $storage->list(undef, recursive => !!1), bag {
+	item 'foo1';
+	item 'bar1';
+	item 'bar/baz1';
 
 	end();
 }, 'file list ok';
 
-$storage->dispose('foo');
-ok !$storage->is_stored('foo'), 'nested foo disposed ok';
+$storage->dispose('foo1');
+ok !$storage->is_stored('foo1'), 'nested foo disposed ok';
 
 done_testing;
 

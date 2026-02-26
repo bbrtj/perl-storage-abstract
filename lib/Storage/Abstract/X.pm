@@ -131,7 +131,8 @@ method call or created from data passed to a method call.
 
 =head3 StorageError
 
-This exception is raised when a problem occurs with the underlying file storage.
+This exception is raised when a problem occurs with the underlying file storage
+or when the storage cannot provide a result to a bad method call.
 
 =head1 INTERFACE
 

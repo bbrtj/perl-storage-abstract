@@ -14,27 +14,32 @@ my $nested_storage = Storage::Abstract->new(
 
 my $storage = Storage::Abstract->new(
 	driver => 'superpath',
-	superpath => '/foo',
+	superpath => '/foo/',
 	source => $nested_storage,
 );
 
 $nested_storage->store('foo', \'foo');
 $nested_storage->store('bar', \'bar');
-$nested_storage->store('bar/baz', \'baz');
+$nested_storage->store('bar2/baz', \'baz');
 
-ok $storage->is_stored('foo/bar/baz'), 'baz stored ok';
-is slurp_handle($storage->retrieve('foo/bar/baz', \my %info)), 'baz', 'baz content ok';
+ok $storage->is_stored('foo', directory => !!1), 'superpath considered stored ok';
+ok !$storage->is_stored('foobar', directory => !!1), 'superpath prefix attack resistant ok';
+ok !$storage->is_stored('bar/foo', directory => !!1), 'bad directory not stored ok';
+
+ok $storage->is_stored('foo/bar2', directory => !!1), 'directory stored ok';
+ok $storage->is_stored('foo/bar2/baz'), 'baz stored ok';
+is slurp_handle($storage->retrieve('foo/bar2/baz', \my %info)), 'baz', 'baz content ok';
 is $info{mtime}, within(time, 3), 'mtime ok';
 is $info{size}, 3, 'size ok';
 
 $storage->store('foo/foo2', \'foo2');
 ok $nested_storage->is_stored('foo2'), 'nested foo stored ok';
 
-is $storage->list, bag {
+is $storage->list(undef, recursive => !!1), bag {
 	item 'foo/foo';
 	item 'foo/foo2';
 	item 'foo/bar';
-	item 'foo/bar/baz';
+	item 'foo/bar2/baz';
 
 	end();
 }, 'file list ok';

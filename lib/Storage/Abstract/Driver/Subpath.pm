@@ -29,8 +29,8 @@ sub source_is_array
 
 sub resolve_path
 {
-	my ($self, $name) = @_;
-	$name = $self->SUPER::resolve_path($name);
+	my ($self, $name, %opts) = @_;
+	$name = $self->SUPER::resolve_path($name, %opts);
 
 	# first resolve, then join path. If the order was reversed, leaving new
 	# root would be possible.

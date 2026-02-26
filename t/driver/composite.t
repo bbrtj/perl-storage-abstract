@@ -26,6 +26,7 @@ my $storage = Storage::Abstract->new(
 ok $storage->is_stored('page.html'), 'page.html stored ok';
 ok $storage->is_stored('utf8.txt'), 'utf8 stored ok';
 ok !$storage->is_stored('foo'), 'foo not stored ok';
+ok $storage->is_stored('deeply', directory => !!1), 'directory stored ok';
 
 ok lives {
 	$storage->store('foo', get_testfile_handle);
@@ -45,7 +46,7 @@ $storage->retrieve('foo', \my %info);
 is $info{mtime}, within(time, 3), 'mtime ok';
 is $info{size}, get_testfile_size, 'size ok';
 
-is $storage->list, bag {
+is $storage->list(undef, recursive => !!1), bag {
 	item 'foo';
 	item 'page.html';
 	item 'utf8.txt';
