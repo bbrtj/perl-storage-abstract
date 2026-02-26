@@ -2,6 +2,16 @@ Revision history for Storage-Abstract
 
 {{$NEXT}}
 
+0.008 - 2026-02-26
+	- Added '%opts' argument to is_stored method
+	- is_stored method can now be used to check whether a directory exists
+	- Added '%opts' argument to dispose method
+	- dispose method can now be used to remove an empty directory
+	- Added '$directory' and '%opts' arguments to list method
+	- list method can now be used on a single directory, with extra options to control listing behavior
+	- [Breaking change] list no longer returns recursive results by default
+	- [Breaking change] memory driver no longer permits storing files and directories under the same name
+
 0.007 - 2025-03-08
 	- Added 'refresh' method to Storage::Abstract and its drivers
 	- Defined 'public_url' extension key in retrieve properties
